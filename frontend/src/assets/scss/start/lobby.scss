@@ -27,14 +27,13 @@ $ff-h2: 'Reenie Beanie';
         padding: 2rem;
 
         .lobby-heading {
-            padding: 2rem;
+            font-family: $ff-h2;
+            text-align: center;
+            padding-bottom: 2rem;
         }
 
         .lobby-heading2 {
-            padding: 1rem;
-        }
-
-        .lobby-heading {
+            padding-top: 4rem;
             font-family: $ff-h2;
             text-align: center;
         }
@@ -53,7 +52,6 @@ $ff-h2: 'Reenie Beanie';
                 font-size: 1.5rem;
                 padding: 1rem;
             }
-
         }
 
         .start-game-btn {
