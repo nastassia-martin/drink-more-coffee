@@ -37,7 +37,14 @@ $ff-header: 'Annie Use Your Telescope', cursive;
 
         .nickname-input {
             background-color: #D38483;
+            color: #FFF;
             border-radius: 15px;
+            border: 0;
+        }
+
+        .nickname-input::placeholder {
+            color: #FFF;
+            letter-spacing: 3px;
         }
 
         .nickname-submit {
