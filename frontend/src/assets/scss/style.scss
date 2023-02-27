@@ -1,3 +1,11 @@
-#app {
-    background-color: red;
+@import 'bootstrap/scss/bootstrap';
+@import url('https://fonts.googleapis.com/css2?family=Annie+Use+Your+Telescope&family=Cairo&display=swap');
+@import './start/start';
+
+/* FONT STACKS */
+$ff-main: 'Cairo', sans-serif;
+$ff-header: 'Annie Use Your Telescope', cursive;
+
+.container {
+    font-family: $ff-main;
 }
