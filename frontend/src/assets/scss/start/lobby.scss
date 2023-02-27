@@ -1,0 +1,26 @@
+/* FONT STACKS */
+$ff-main: 'Cairo', sans-serif;
+$ff-header: 'Annie Use Your Telescope', cursive;
+$ff-h2: 'Reenie Beanie';
+
+.lobby-container {
+    background-color: #E7A7A5;
+    height: 100vh;
+    width: 100vw;
+}
+
+.heading-center {
+    .lobby-content {
+        display: flex;
+
+        .lobby-heading {
+            font-family: $ff-h2;
+        }
+
+        .gif {
+            pointer-events: none;
+            cursor: default;
+        }
+
+    }
+}
