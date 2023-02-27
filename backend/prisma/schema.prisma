@@ -11,6 +11,13 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  nickname String
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  nickname   String
+  gameRoomId String?   @db.ObjectId
+  gameRoom   GameRoom? @relation(fields: [gameRoomId], references: [id])
+}
+
+model GameRoom {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  users User[]
 }

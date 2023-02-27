@@ -3,7 +3,8 @@
  */
 
 import prisma from '../prisma'
-import { CreateUser } from '../types'
+import { CreateUser } from '../types/shared/SocketTypes'
+
 
 /**
  * Create user 
