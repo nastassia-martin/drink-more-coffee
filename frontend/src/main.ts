@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, CreateUser, ServerToClientEvents } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -29,9 +29,11 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 
     // Check if available rooms? If available room, put user in there, or else create new? 
 
+    // Get nr of rooms with at least 1 user in database
+
 
     // Save nickname and emit to the server
-    const user: CreateUser = {
+    const user: User = {
         nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value
     }
 

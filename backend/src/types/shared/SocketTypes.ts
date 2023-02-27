@@ -3,9 +3,15 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-    userJoin: (user: CreateUser) => void
+    userJoin: (user: User) => void
 }
 
-export type CreateUser = {
+export type User = {
     nickname: string
 }
+
+export type GameRoom = {
+    name: string
+    users: User[] | null
+}
+
