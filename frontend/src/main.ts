@@ -34,6 +34,7 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 
     // Save nickname and emit to the server
     const user: User = {
+        id: socket.id,
         nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value
     }
 

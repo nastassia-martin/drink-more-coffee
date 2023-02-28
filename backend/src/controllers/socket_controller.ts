@@ -3,8 +3,8 @@ const debug = Debug('chat:socket_controller')
 
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
-import { createUser } from '../service/user_service'
-import { getRooms, createRoom, connectUser } from '../service/gameroom_service'
+import { createUser, updateUser } from '../service/user_service'
+import { getRooms, createRoom } from '../service/gameroom_service'
 import { checkAvailableRooms } from './room_controller'
 import { Gameroom } from '@prisma/client'
 
@@ -13,16 +13,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
     // Listen for user created
     socket.on('userJoin', async (user) => {
-        debug('User incoming:', user)
+        debug('User incoming from client:', user)
 
-        const availableRoom = await checkAvailableRooms(user)
+        // Create the incoming user in the database 
+        await createUser(user)
 
-        // Create the incoming user in the database
-        await createUser(user, availableRoom)
+        // Get the id of the Gameroom user are supposed to enter
+        const availableRoomId = await checkAvailableRooms(user)
 
-        // Connect user
-        await connectUser(user, availableRoom)
+        if (!availableRoomId) {
+            debug('No available room was found')
+            return
+        }
 
-        // i could save the "available room" from that function, and use that to create the user 
+        // Connect user to gameroom 
+        await updateUser(user, availableRoomId)
+
+        // Add user to gameroom available
+        // socket.join(availableRoomId)
     })
 }

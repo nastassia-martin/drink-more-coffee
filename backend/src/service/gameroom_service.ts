@@ -6,38 +6,33 @@ import prisma from '../prisma'
 import { GameRoom, User } from '../types/shared/SocketTypes'
 
 /**
- * Create room 
+ * Get all rooms and their users 
  */
-export const createRoom = async (room: GameRoom) => {
-    return await prisma.gameroom.create({
-        data: {
-            name: room.name
-        }, include: {
+export const getRooms = async () => {
+    return await prisma.gameroom.findMany({
+        include: {
             users: true
         }
     })
 }
 
 /**
- * Connect user to room
+ * Create room 
  */
-export const connectUser = async (user: User, gameroomId: string) => {
-    return await prisma.gameroom.update({
-        where: {
-            id: gameroomId
-        }, data: {
+export const createRoom = async (room: GameRoom, user: User) => {
+    return await prisma.gameroom.create({
+        data: {
+            name: room.name,
+            userConnected: true,
             users: {
-                connect: {
-                    id: user.id
+                connectOrCreate: {
+                    where: { id: user.id },
+                    create: {
+                        id: user.id,
+                        nickname: user.nickname
+                    }
                 }
             }
         }
     })
-}
-
-/**
- * Get all rooms and their users 
- */
-export const getRooms = async () => {
-    return await prisma.gameroom.findMany()
 }
