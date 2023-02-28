@@ -24,7 +24,7 @@ export const checkAvailableRooms = async (user: User) => {
     }
 
     const createdRoom = await createRoom(newRoom)
-    debug('Created room:', createdRoom)
+    debug('Created room:')
     return createdRoom.id
     //}
 
