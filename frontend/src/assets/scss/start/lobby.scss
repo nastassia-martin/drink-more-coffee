@@ -65,7 +65,22 @@ $ff-h2: 'Reenie Beanie';
             font-family: $ff-main;
             text-transform: none;
         }
+    }
 
+    .go-back-btn {
+        font-family: $ff-h2;
+        background-color: transparent;
+        border-radius: 8px;
+        margin-left: 2rem;
+        padding: 0.5rem;
+        border: 2px solid black;
+        color: black;
+        font-size: 1.2rem;
+    }
+
+    .go-back-btn:hover {
+        border: 2px solid #7FA2C3;
+        color: #7FA2C3;
     }
 
 }
