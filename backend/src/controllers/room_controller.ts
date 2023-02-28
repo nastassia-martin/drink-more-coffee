@@ -24,16 +24,28 @@ export const checkAvailableRooms = async (user: User) => {
             users: null
         }
 
+        // Add count on roomNr 
+        roomNr++
+
         // Create a room in db
         const createdRoom = await createRoom(newRoom, user)
 
         // Return the id of the createdRoom
         return createdRoom.id
+    } else {
+        // Check if there is a room with one user connected (waiting)
+        const usersInGameroom = rooms.map(room => {
+            return room.users.map(user => user.id)
+        })
+
+        const userInGameroom = rooms.map(room => {
+            // kolla om roomId matchar mer users id 
+
+        })
+
+        debug('Users in gameroom:', usersInGameroom)
     }
 
-    // Check if there is a room with one user connected (waiting)
-    const usersInGameroom = rooms.map(room => room.users)
-    debug('Users in gameroom:', usersInGameroom)
 
 
     // find rooms med användare färre än 2
