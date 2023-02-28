@@ -19,5 +19,6 @@ model User {
 
 model Gameroom {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
   users User[]
 }
