@@ -7,10 +7,13 @@ export interface ClientToServerEvents {
 }
 
 export type User = {
-    nickname: string
+    id?: string,
+    nickname: string,
+    roomId?: string
 }
 
 export type GameRoom = {
+    id?: string,
     name: string
     users: User[] | null
 }

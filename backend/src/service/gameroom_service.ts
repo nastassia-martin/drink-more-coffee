@@ -8,10 +8,10 @@ import { GameRoom, User } from '../types/shared/SocketTypes'
 /**
  * Create room 
  */
-export const createRoom = async (data: GameRoom) => {
+export const createRoom = async (room: GameRoom) => {
     return await prisma.gameroom.create({
         data: {
-            name: data.name
+            name: room.name
         }
     })
 }

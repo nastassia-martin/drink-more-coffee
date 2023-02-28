@@ -3,15 +3,18 @@
  */
 
 import prisma from '../prisma'
-import { User } from '../types/shared/SocketTypes'
+import { GameRoom, User } from '../types/shared/SocketTypes'
 
 
 /**
  * Create user 
  */
-export const createUser = async (data: User) => {
+export const createUser = async (data: User, gameroomId: string) => {
     return await prisma.user.create({
-        data: data
+        data: {
+            nickname: data.nickname,
+            gameroomId
+        }
     })
 }
 
