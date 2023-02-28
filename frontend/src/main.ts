@@ -48,4 +48,10 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     socket.emit('userJoin', user)
 
     console.log(user)
+
+    /**
+     * When "gå vidare" button clicked, go to lobby
+     */
+    document.querySelector('.start-container')!.classList.add('hide')
+
 })
