@@ -1,6 +1,7 @@
 **FONT STACKS**
 $ff-main: 'Cairo', sans-serif;
 $ff-header: 'Annie Use Your Telescope', cursive;
+$ff-h2: 'Reenie Beanie', sans serif;
 
 **BORDER RADIUS** 
 15px 
