@@ -14,11 +14,11 @@ const addRoom = async (user: User) => {
         users: null
     }
 
-    // Add count on roomNr 
-    roomNr++
-
     // Create a room in db
     const createdRoom = await createRoom(newRoom, user)
+
+    // Add count on roomNr 
+    roomNr++
 
     // Return the id of the createdRoom
     return createdRoom.id
