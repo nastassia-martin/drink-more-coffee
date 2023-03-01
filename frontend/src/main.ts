@@ -53,6 +53,7 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
      * When "gå vidare" button clicked, go to lobby
      */
     document.querySelector('.start-container')!.classList.add('hide')
+    document.querySelector('.lobby-container')!.classList.remove('hide')
 
 })
 
