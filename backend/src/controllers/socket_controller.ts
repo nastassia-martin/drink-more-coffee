@@ -4,9 +4,7 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { createUser, updateUser } from '../service/user_service'
-import { getRooms, createRoom } from '../service/gameroom_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { Gameroom } from '@prisma/client'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -29,17 +27,15 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             socket.join(availableRoomId)
         }
 
+        // Check if there is an player waiting or not, returns true/false
         const playerWaiting = await checkPlayerStatus()
-        debug(playerWaiting)
 
         if (playerWaiting) {
-            // Emit playerWaiting
+            // Emit playerWaiting to the client
             socket.emit('playerWaiting', user)
-            debug('emitted playerWaiting to client')
         } else {
-            // Emit playerReady
+            // Emit playerReady to the client
             socket.emit('playerReady', user)
-            debug('emitted playerReady to clieten')
         }
     })
 
@@ -50,6 +46,5 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         socket.emit('gameStarted', (delay))
 
         // Randomise position
-
     })
 }
