@@ -7,6 +7,10 @@
 $ff-main: 'Cairo', sans-serif;
 $ff-header: 'Annie Use Your Telescope', cursive;
 
+body {
+    background-color: #E7A7A5;
+}
+
 .container {
     font-family: $ff-main;
     height: 100vh;

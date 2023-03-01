@@ -2,59 +2,16 @@
 $ff-main: 'Cairo', sans-serif;
 $ff-header: 'Annie Use Your Telescope', cursive;
 
-.game-room-container {
-    background-color: #E7A7A5;
-    height: 100vh;
-    width: 100vw;
-    height: 100vh;
-    margin: auto;
-    padding: 70px 0;
+.spelrummet {
+    font-family: $ff-h2;
+}
 
-    // .heading-container {
-    //     height: 60%;
-    //     width: 100%;
+.player-container {
+    font-family: $ff-main;
+}
 
-
-    //     .start-heading {
-    //         float: left;
-    //         padding: 50px;
-    //         color: #FFF;
-    //         font-family: $ff-header;
-    //         font-size: 80px;
-    //     }
-    // }
-
-    // .nickname-container {
-    //     height: 40%;
-    //     width: 30%;
-
-    //     .nickname-label {
-    //         width: 100%;
-    //         color: #FFF;
-    //         text-align: center;
-    //         font-size: 18px;
-    //     }
-
-    //     .nickname-input {
-    //         background-color: #D38483;
-    //         color: #FFF;
-    //         border-radius: 15px;
-    //         border: 0;
-    //     }
-
-    //     .nickname-input::placeholder {
-    //         color: #FFF;
-    //         letter-spacing: 3px;
-    //     }
-
-    //     .nickname-submit {
-    //         width: 100%;
-    //         height: 70px;
-    //         background-color: #7FA2C3;
-    //         color: #FFF;
-    //         text-transform: uppercase;
-    //         font-size: 25px;
-    //         border-radius: 15px;
-    //     }
-    // }
+#game-grid {
+    width: 100%;
+    height: 100px;
+    background-color: white;
 }

@@ -45,26 +45,31 @@
   <!-- game -->
   <div class="container game-room-container">
     <div>
-      <h2 class="text-center">Spelrummet</h2>
+      <h2 class="mt-5 text-center spelrummet">Spelrummet</h2>
     </div>
-    <div class="player-container">
-      <ul>
+    <div class="player-container row mt-5 p-3 text-center">
+      <ul class="col list-unstyled text-start">
         <li class="">Player 1 name</li>
-        <li>Player 1 reaction time</li>
+        <li>00:02:01</li>
       </ul>
-      <span>Score</span>
-      <ul>
-        <li>Player 2 name</li>
-        <li>Player 2 reaction time</li>
-      </ul>
-      <div id="game-grid"></div>
-      <div>
-        <h3>Runda</h3>
-        <ul>
-          <li><span id="current-round">1</span>/10</li>
-        </ul>
+      <div class="col text-center fs-1">
+        <span class="player-1-score">3</span>
+        <span>-</span>
+        <span class="player-2-score">2</span>
       </div>
+      <ul class="col list-unstyled text-end">
+        <li>Player 2 name</li>
+        <li>00:03:01</li>
+      </ul>
     </div>
+    <div id="game-grid"></div>
+    <div>
+      <h3 class="text-center pt-4">Runda</h3>
+      <ul class="list-unstyled text-center">
+        <li><span id="current-round">1</span>/10</li>
+      </ul>
+    </div>
+
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
