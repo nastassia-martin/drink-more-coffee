@@ -56,6 +56,16 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 
 })
 
+/**
+ * If another user connected, show "spelare redo"
+ */
+
+
+/**
+ * If no other user connected, show "väntar på spelare"
+ */
+
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
 })
+
