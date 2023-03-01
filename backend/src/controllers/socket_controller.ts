@@ -43,11 +43,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
-
-
-
-
-
     // Listen for game starting
     socket.on('startGame', () => {
         // Randomise delay and emit to client
