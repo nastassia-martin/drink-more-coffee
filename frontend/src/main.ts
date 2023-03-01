@@ -63,24 +63,6 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
 })
 
-/**
- * START GAME
- */
-document.querySelector('.start-game-btn')?.addEventListener('click', e => {
-    // Let the server know the game is started and players are ready
-    socket.emit('startGame')
-    console.log('startGame emitted to the server')
-
-    // Listen for gameStarted, gives us delay and position
-    socket.on('gameStarted', (delay) => {
-        // Use delay from server to set the timeout
-        setTimeout(() => {
-            // INSERT COFFEE CUP 
-            console.log('HEJ HEJ', delay)
-        }, delay * 1000)
-    })
-})
-
 // Listen for playerWaiting
 socket.on('playerWaiting', (user) => {
     console.log('Player is waiting')
@@ -102,4 +84,21 @@ socket.on('playerReady', (user) => {
         <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
     `
 
+    /**
+     * START GAME
+     */
+    document.querySelector('.start-game-btn')?.addEventListener('click', e => {
+        // Let the server know the game is started and players are ready
+        socket.emit('startGame')
+        console.log('startGame emitted to the server')
+
+        // Listen for gameStarted, gives us delay and position
+        socket.on('gameStarted', (delay) => {
+            // Use delay from server to set the timeout
+            setTimeout(() => {
+                // INSERT COFFEE CUP 
+                console.log('HEJ HEJ', delay)
+            }, delay * 1000)
+        })
+    })
 })
