@@ -6,6 +6,11 @@ const debug = Debug('chat:room_controller')
 
 let roomNr = 1
 
+/**
+ * Create a new room in db and add to count
+ * @param user: the user connected
+ * @returns the id of the created room
+ */
 const addRoom = async (user: User) => {
     // Create a room object
     const newRoom: GameRoom = {
@@ -56,3 +61,6 @@ export const checkAvailableRooms = async (user: User) => {
     }
 }
 
+/**
+ * 
+ */

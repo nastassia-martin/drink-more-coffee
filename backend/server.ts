@@ -2,7 +2,7 @@ import app from './src/app'
 import http from 'http'
 import * as dotenv from 'dotenv'
 import { Server } from 'socket.io'
-import { ClientToServerEvents, ServerToClientEvents } from './src/types/SocketTypes'
+import { ClientToServerEvents, ServerToClientEvents } from './src/types/shared/SocketTypes'
 import { handleConnection } from './src/controllers/socket_controller'
 
 dotenv.config()

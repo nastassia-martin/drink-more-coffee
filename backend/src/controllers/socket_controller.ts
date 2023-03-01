@@ -30,6 +30,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         await updateUser(user, availableRoomId)
 
         // Add user to gameroom available
-        // socket.join(availableRoomId)
+        socket.join(availableRoomId)
+    })
+
+    // Listen for game starting
+    socket.on('startGame', () => {
+        debug('startGame recieved from the client')
+        // Randomise delay
+        const delay = 1000
+        socket.emit('gameStarted', (delay))
+
+        // Randomise position
     })
 }

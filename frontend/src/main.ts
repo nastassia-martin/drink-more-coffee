@@ -27,11 +27,6 @@ socket.on('disconnect', () => {
 document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     e.preventDefault()
 
-    // Check if available rooms? If available room, put user in there, or else create new? 
-
-    // Get nr of rooms with at least 1 user in database
-
-
     // Save nickname and emit to the server
     const user: User = {
         id: socket.id,
@@ -47,15 +42,29 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     // Emit user joined to the server
     socket.emit('userJoin', user)
 
-    console.log(user)
-
     /**
      * When "gå vidare" button clicked, go to lobby
      */
     document.querySelector('.start-container')!.classList.add('hide')
-
 })
 
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
+})
+
+/**
+ * START GAME
+ */
+document.querySelector('.start-game-btn')?.addEventListener('click', e => {
+    // Let the server know the game is started and players are ready
+    socket.emit('startGame')
+    console.log('startGame emitted to the server')
+
+    // Listen for gameStarted, gives us delay and position
+    socket.on('gameStarted', (delay) => {
+        // Use delay from server to set the timeout
+        setTimeout(() => {
+            console.log('HEJ HEJ')
+        }, delay)
+    })
 })
