@@ -36,10 +36,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     // Listen for game starting
     socket.on('startGame', () => {
         debug('startGame recieved from the client')
-        // Randomise delay
-        const delay = 1000
+        // Randomise delay and emit to client
+        const delay = Math.floor(Math.random() * (6 - 1) + 1)
         socket.emit('gameStarted', (delay))
 
         // Randomise position
+
     })
 }

@@ -64,7 +64,8 @@ document.querySelector('.start-game-btn')?.addEventListener('click', e => {
     socket.on('gameStarted', (delay) => {
         // Use delay from server to set the timeout
         setTimeout(() => {
-            console.log('HEJ HEJ')
-        }, delay)
+            // INSERT COFFEE CUP 
+            console.log('HEJ HEJ', delay)
+        }, delay * 1000)
     })
 })
