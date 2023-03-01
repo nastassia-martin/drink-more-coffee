@@ -4,6 +4,26 @@ import Debug from "debug"
 import { getUsersInGameroom, updateUser } from "../service/user_service"
 const debug = Debug('chat:room_controller')
 
+let roomNr = 1
+
+const addRoom = async (user: User) => {
+    // Create a room object
+    const newRoom: GameRoom = {
+        name: `Gameroom #${roomNr}`,
+        connectedUser: false,
+        users: null
+    }
+
+    // Add count on roomNr 
+    roomNr++
+
+    // Create a room in db
+    const createdRoom = await createRoom(newRoom, user)
+
+    // Return the id of the createdRoom
+    return createdRoom.id
+}
+
 /*
  * Check if room exists, or else, create a new room
  * Check if a user is waiting, if not, connect user to a new room
@@ -15,40 +35,24 @@ export const checkAvailableRooms = async (user: User) => {
 
     // If no rooms found, create a new room with users null
     if (rooms.length < 1) {
-        let roomNr = 1
-
-        // Create a room object
-        const newRoom: GameRoom = {
-            name: `Gameroom #${roomNr}`,
-            connectedUser: false,
-            users: null
-        }
-
-        // Add count on roomNr 
-        roomNr++
-
-        // Create a room in db
-        const createdRoom = await createRoom(newRoom, user)
-
-        // Return the id of the createdRoom
-        return createdRoom.id
+        debug('Room < 1, created new room with one user')
+        addRoom(user)
     } else {
         // Check if there is a room with one user connected (waiting)
-        const usersInGameroom = rooms.map(room => {
-            return room.users.map(user => user.id)
-        })
+        const nrOfUsersInGameroom = rooms.map(room => room.users.length)
+        const availableRoomFound = nrOfUsersInGameroom.find(room => room < 2)
 
-        const userInGameroom = rooms.map(room => {
-            // kolla om roomId matchar mer users id 
+        if (availableRoomFound) {
+            const users = rooms.map(room => room.users)
+            const singleUser = users.find(user => user.length < 2)
 
-        })
-
-        debug('Users in gameroom:', usersInGameroom)
+            if (singleUser) {
+                return singleUser[0].gameroomId
+            }
+        } else {
+            addRoom(user)
+            debug('Room full, created new room with one user')
+        }
     }
-
-
-
-    // find rooms med användare färre än 2
 }
-
 
