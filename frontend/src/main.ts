@@ -69,23 +69,26 @@ document.querySelector('.start-game-btn')?.addEventListener('click', e => {
         }, delay * 1000)
     })
 })
-const startBtn = document.querySelector('.start-game-btn')
 
 // Listen for playerWaiting
-socket.on('playerWaiting', () => {
+socket.on('playerWaiting', (user) => {
+    console.log('Player is waiting')
     document.querySelector('.heading-center')!.innerHTML =
-        `<h2 class="lobby-heading">Väntar på motspelare...</h2>
+        `<h2 class="lobby-heading">${user.nickname} väntar på motspelare...</h2>
     <div class="gif-img">
       <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
     </div>
     <h2 class="lobby-heading2">Motpelare inte redo...</h2>
-    <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>`
-
+    <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
+    `
 })
 
 // Listen for playerReady
-socket.on('playerReady', () => {
+socket.on('playerReady', (user) => {
+    console.log('Player is ready')
     document.querySelector('.heading-center')!.innerHTML =
-        `<h2 class="lobby-heading">Player is ready...</h2>
-        <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>`
+        `<h2 class="lobby-heading">${user.nickname} ready..</h2>
+        <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
+    `
+
 })

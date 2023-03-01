@@ -34,11 +34,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         if (playerWaiting) {
             // Emit playerWaiting
-            socket.emit('playerWaiting')
+            socket.emit('playerWaiting', user)
             debug('emitted playerWaiting to client')
         } else {
             // Emit playerReady
-            socket.emit('playerReady')
+            socket.emit('playerReady', user)
             debug('emitted playerReady to clieten')
         }
     })

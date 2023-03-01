@@ -19,7 +19,9 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
 
 // Incoming Socket.IO connection
 io.on('connection', (socket) => {
+    console.log('hejejej')
     handleConnection(socket)
+
 })
 
 // Listening on server start
