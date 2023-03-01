@@ -5,7 +5,7 @@ import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/Sock
 import { Socket } from 'socket.io'
 import { createUser, updateUser } from '../service/user_service'
 import { getRooms, createRoom } from '../service/gameroom_service'
-import { checkAvailableRooms } from './room_controller'
+import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 import { Gameroom } from '@prisma/client'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -21,21 +21,35 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         // Get the id of the Gameroom user are supposed to enter
         const availableRoomId = await checkAvailableRooms(user)
 
-        if (!availableRoomId) {
-            debug('No available room was found')
-            return
+        if (availableRoomId) {
+            // Connect user to gameroom 
+            await updateUser(user, availableRoomId)
+
+            // Add user to gameroom available
+            socket.join(availableRoomId)
         }
 
-        // Connect user to gameroom 
-        await updateUser(user, availableRoomId)
+        const playerWaiting = await checkPlayerStatus()
+        debug(playerWaiting)
 
-        // Add user to gameroom available
-        socket.join(availableRoomId)
+        if (playerWaiting) {
+            // Emit playerWaiting
+            socket.emit('playerWaiting')
+            debug('emitted playerWaiting to client')
+        } else {
+            // Emit playerReady
+            socket.emit('playerReady')
+            debug('emitted playerReady to clieten')
+        }
     })
+
+
+
+
+
 
     // Listen for game starting
     socket.on('startGame', () => {
-        debug('startGame recieved from the client')
         // Randomise delay and emit to client
         const delay = Math.floor(Math.random() * (6 - 1) + 1)
         socket.emit('gameStarted', (delay))

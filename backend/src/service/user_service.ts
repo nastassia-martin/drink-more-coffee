@@ -43,7 +43,7 @@ export const updateUser = async (user: User, gameroomId: string) => {
         where: {
             id: user.id
         }, data: {
-            gameroomId: gameroomId
+            gameroomId
         }
     })
 }

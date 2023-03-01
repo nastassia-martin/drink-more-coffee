@@ -1,5 +1,7 @@
 export interface ServerToClientEvents {
     gameStarted: (delay: number) => void
+    playerWaiting: () => void
+    playerReady: () => void
 }
 
 export interface ClientToServerEvents {

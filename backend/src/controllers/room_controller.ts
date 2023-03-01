@@ -29,6 +29,15 @@ const addRoom = async (user: User) => {
     return createdRoom.id
 }
 
+/**
+ * 
+ * @param user 
+ * @returns 
+ */
+//export let playerWaiting: boolean = false
+
+
+
 /*
  * Check if room exists, or else, create a new room
  * Check if a user is waiting, if not, connect user to a new room
@@ -36,12 +45,13 @@ const addRoom = async (user: User) => {
 export const checkAvailableRooms = async (user: User) => {
     // Look for rooms available
     const rooms = await getRooms()
-    debug('rooms found:', rooms)
 
     // If no rooms found, create a new room with users null
     if (rooms.length < 1) {
+        // VÄNTAR PÅ SPELARE
+        // Här blir man ensam spelare i ett rum
         debug('Room < 1, created new room with one user')
-        addRoom(user)
+        return await addRoom(user)
     } else {
         // Check if there is a room with one user connected (waiting)
         const nrOfUsersInGameroom = rooms.map(room => room.users.length)
@@ -52,11 +62,16 @@ export const checkAvailableRooms = async (user: User) => {
             const singleUser = users.find(user => user.length < 2)
 
             if (singleUser) {
+                // REDO 
+                // Här kommer båda spelarna att vara redo
+                debug('Found available room')
                 return singleUser[0].gameroomId
             }
         } else {
-            addRoom(user)
+            // VÄNTAR PÅ SPELARE
+            // Här blir man ensam spelare i ett rum
             debug('Room full, created new room with one user')
+            return await addRoom(user)
         }
     }
 }
@@ -64,3 +79,38 @@ export const checkAvailableRooms = async (user: User) => {
 /**
  * 
  */
+export const checkPlayerStatus = async () => {
+    let playerWaiting: Boolean
+
+    // Look for rooms available
+    const rooms = await getRooms()
+
+    // If no rooms found, create a new room with users null
+    if (rooms.length < 1) {
+        // VÄNTAR PÅ SPELARE
+        // Här blir man ensam spelare i ett rum
+        debug('Player waiting')
+        return playerWaiting = true
+    } else {
+        // Check if there is a room with one user connected (waiting)
+        const nrOfUsersInGameroom = rooms.map(room => room.users.length)
+        const availableRoomFound = nrOfUsersInGameroom.find(room => room < 2)
+
+        if (availableRoomFound) {
+            const users = rooms.map(room => room.users)
+            const singleUser = users.find(user => user.length < 2)
+
+            if (singleUser) {
+                // REDO 
+                // Här kommer båda spelarna att vara redo
+                debug('Player not waiting')
+                return playerWaiting = false
+            }
+        } else {
+            // VÄNTAR PÅ SPELARE
+            // Här blir man ensam spelare i ett rum
+            debug('Player waiting')
+            return playerWaiting = true
+        }
+    }
+}

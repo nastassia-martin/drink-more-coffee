@@ -69,3 +69,13 @@ document.querySelector('.start-game-btn')?.addEventListener('click', e => {
         }, delay * 1000)
     })
 })
+
+// Listen for playerWaiting
+socket.on('playerWaiting', () => {
+    console.log('tog emot playerWaiting')
+})
+
+// Listen for playerReady
+socket.on('playerReady', () => {
+    console.log('tog emot playerReady')
+})
