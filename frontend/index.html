@@ -23,6 +23,49 @@
       </form>
     </div>
   </div>
+  <div class="lobby lobby-container">
+    <button class="go-back-btn">Tillbaka till start</button>
+    <div class="lobby-content">
+      <div class="highscore-column white-column">
+        <h3>Highscores</h3>
+      </div>
+      <div class="heading-center">
+        <h2 class="lobby-heading">Väntar på motspelare...</h2>
+        <div class="gif-img">
+          <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
+        </div>
+        <h2 class="lobby-heading2">Motpelare inte redo...</h2>
+        <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
+      </div>
+      <div class="ongoing-games-column white-column">
+        <h3>Pågående spel</h3>
+      </div>
+    </div>
+  </div>
+  <!-- game -->
+  <div class="container game-room-container">
+    <div>
+      <h2 class="text-center">Spelrummet</h2>
+    </div>
+    <div class="player-container">
+      <ul>
+        <li class="">Player 1 name</li>
+        <li>Player 1 reaction time</li>
+      </ul>
+      <span>Score</span>
+      <ul>
+        <li>Player 2 name</li>
+        <li>Player 2 reaction time</li>
+      </ul>
+      <div id="game-grid"></div>
+      <div>
+        <h3>Runda</h3>
+        <ul>
+          <li><span id="current-round">1</span>/10</li>
+        </ul>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 
