@@ -79,7 +79,7 @@ socket.on('playerWaiting', (user) => {
       <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
     </div>
     <h2 class="lobby-heading2">Motpelare inte redo...</h2>
-    <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
+    <button disabled type="submit" class="btn start-game-btn mt-4">Starta spel</button>
     `
 })
 
