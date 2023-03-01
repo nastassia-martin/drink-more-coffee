@@ -1,9 +1,10 @@
 import { getRooms, createRoom } from "../service/gameroom_service"
 import { GameRoom, User } from "../types/shared/SocketTypes"
+
 import Debug from "debug"
-import { getUsersInGameroom, updateUser } from "../service/user_service"
 const debug = Debug('chat:room_controller')
 
+// Globally scoped, so addRoom can be called without reset 
 let roomNr = 1
 
 /**
@@ -29,69 +30,44 @@ const addRoom = async (user: User) => {
     return createdRoom.id
 }
 
-/**
- * 
- * @param user 
- * @returns 
- */
-//export let playerWaiting: boolean = false
-
-
-
 /*
  * Check if room exists, or else, create a new room
  * Check if a user is waiting, if not, connect user to a new room
  */
 export const checkAvailableRooms = async (user: User) => {
-    // Look for rooms available
+    // Get rooms and their users
     const rooms = await getRooms()
 
     // If no rooms found, create a new room with users null
-    if (rooms.length < 1) {
-        // VÄNTAR PÅ SPELARE
-        // Här blir man ensam spelare i ett rum
-        debug('Room < 1, created new room with one user')
-        return await addRoom(user)
-    } else {
+    if (rooms.length < 1) return await addRoom(user)
+    else {
         // Check if there is a room with one user connected (waiting)
         const nrOfUsersInGameroom = rooms.map(room => room.users.length)
         const availableRoomFound = nrOfUsersInGameroom.find(room => room < 2)
 
+        // If available room found, get the single user and return their gameroomId
         if (availableRoomFound) {
             const users = rooms.map(room => room.users)
             const singleUser = users.find(user => user.length < 2)
-
-            if (singleUser) {
-                // REDO 
-                // Här kommer båda spelarna att vara redo
-                debug('Found available room')
-                return singleUser[0].gameroomId
-            }
-        } else {
-            // VÄNTAR PÅ SPELARE
-            // Här blir man ensam spelare i ett rum
-            debug('Room full, created new room with one user')
-            return await addRoom(user)
-        }
+            if (singleUser) return singleUser[0].gameroomId
+        } else return await addRoom(user)
     }
 }
 
 /**
- * 
+ * Check if there is an player waiting or not
+ * @returns playerWaiting true/false
  */
 export const checkPlayerStatus = async () => {
     let playerWaiting: Boolean
 
-    // Look for rooms available
+    // Get rooms and their users
     const rooms = await getRooms()
 
-    // If no rooms found, create a new room with users null
-    if (rooms.length < 1) {
-        // VÄNTAR PÅ SPELARE
-        // Här blir man ensam spelare i ett rum
-        debug('Player waiting')
-        return playerWaiting = true
-    } else {
+    // If no rooms found return playerWaiting true
+    // If room with one user found, return playerWaiting false
+    if (rooms.length < 1) return playerWaiting = true
+    else {
         // Check if there is a room with one user connected (waiting)
         const nrOfUsersInGameroom = rooms.map(room => room.users.length)
         const availableRoomFound = nrOfUsersInGameroom.find(room => room < 2)
@@ -99,18 +75,7 @@ export const checkPlayerStatus = async () => {
         if (availableRoomFound) {
             const users = rooms.map(room => room.users)
             const singleUser = users.find(user => user.length < 2)
-
-            if (singleUser) {
-                // REDO 
-                // Här kommer båda spelarna att vara redo
-                debug('Player not waiting')
-                return playerWaiting = false
-            }
-        } else {
-            // VÄNTAR PÅ SPELARE
-            // Här blir man ensam spelare i ett rum
-            debug('Player waiting')
-            return playerWaiting = true
-        }
+            if (singleUser) return playerWaiting = false
+        } else return playerWaiting = true
     }
 }
