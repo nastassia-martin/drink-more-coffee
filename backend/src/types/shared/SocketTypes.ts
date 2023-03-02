@@ -1,12 +1,12 @@
 export interface ServerToClientEvents {
-    gameStarted: (delay: number) => void
+    showCup: (currentTime: string) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
 }
 
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
-    startGame: () => void
+    startGame: (positionx: number, positiony: number) => void
 }
 
 export type User = {

@@ -51,19 +51,15 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 })
 
 /**
- * If another user connected, show "spelare redo"
+ * When "Gå tillbaka till start" btn clicked, go to start view
  */
-
-
-/**
- * If no other user connected, show "väntar på spelare"
- */
-
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
 })
 
-// Listen for playerWaiting
+/**
+ * If no other user connected, show "väntar på spelare"
+ */
 socket.on('playerWaiting', (user) => {
     console.log('Player is waiting')
     document.querySelector('.heading-center')!.innerHTML =
@@ -76,7 +72,9 @@ socket.on('playerWaiting', (user) => {
     `
 })
 
-// Listen for playerReady
+/**
+ * If another user connected, show "spelare redo"
+ */
 socket.on('playerReady', (user) => {
     console.log('Player is ready')
     document.querySelector('.heading-center')!.innerHTML =
@@ -88,17 +86,38 @@ socket.on('playerReady', (user) => {
      * START GAME
      */
     document.querySelector('.start-game-btn')?.addEventListener('click', e => {
-        // Let the server know the game is started and players are ready
-        socket.emit('startGame')
-        console.log('startGame emitted to the server')
+        let x = 4
+        let y = 6
 
-        // Listen for gameStarted, gives us delay and position
-        socket.on('gameStarted', (delay) => {
-            // Use delay from server to set the timeout
-            setTimeout(() => {
-                // INSERT COFFEE CUP 
-                console.log('HEJ HEJ', delay)
-            }, delay * 1000)
+        // Let the server know the game is started and players are ready
+        socket.emit('startGame', x, y)
+
+        // Listen for when cup should show, gives us the current time
+        socket.on('showCup', (currentTime) => {
+            // INSERT COFFEE CUP 
+
+            document.querySelector('#game-grid')!.innerHTML = `<button id="test">Testknapp</button>`
+            console.log("Current time:", currentTime)
+
+
+
+
+            /**
+             * Listen for clicks on coffee cup
+             */
+            document.querySelector('#test')?.addEventListener('click', (e) => {
+                // Emit the current time when cup is clicked
+                // @ todo Emit the current time when game is starting
+                console.log('test')
+            })
+
+
         })
     })
 })
+
+
+
+// Listen for reaction time
+
+// Write out result

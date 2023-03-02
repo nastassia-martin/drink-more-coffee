@@ -40,11 +40,25 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for game starting
-    socket.on('startGame', () => {
-        // Randomise delay and emit to client
-        const delay = Math.floor(Math.random() * (6 - 1) + 1)
-        socket.emit('gameStarted', (delay))
-
+    socket.on('startGame', (positionx, positiony) => {
         // Randomise position
+
+        // Randomise delay 
+        const delay = Math.floor(Math.random() * (6 - 1) + 1)
+
+        // After delay, get the current time and emit to client
+        setTimeout(() => {
+            const date = new Date()
+            let currentTime = date.toLocaleTimeString()
+            socket.emit('showCup', currentTime)
+        }, delay * 1000)
+
+
     })
+
+    // Listen for game started, recieve current time game started
+
+    // Listen for cup clicked, recieve current time cup was clicked
+    // Measure reaction time between started and clicked
+    // Emit reaction time to the client
 }

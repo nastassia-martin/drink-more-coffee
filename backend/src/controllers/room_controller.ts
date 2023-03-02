@@ -79,3 +79,10 @@ export const checkPlayerStatus = async () => {
         } else return playerWaiting = true
     }
 }
+
+/**
+ * Measure reaction time
+ */
+const measureReactionTime = () => {
+
+}
