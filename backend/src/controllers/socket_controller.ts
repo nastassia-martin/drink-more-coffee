@@ -5,6 +5,9 @@ import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/Sock
 import { Socket } from 'socket.io'
 import { createUser, updateUser } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
+import { Stopwatch } from "ts-stopwatch";
+
+const stopwatch = new Stopwatch()
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -39,26 +42,55 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
-    // Listen for game starting
-    socket.on('startGame', (positionx, positiony) => {
+    // Listen for game starting, recieve positions
+    socket.on('startGame', () => {
         // Randomise position
 
+        // Set start time
+        const reactionTime = `00:00:00`
+
         // Randomise delay 
-        const delay = Math.floor(Math.random() * (6 - 1) + 1)
+        const delay = randomiseDelay()
 
         // After delay, get the current time and emit to client
         setTimeout(() => {
-            const date = new Date()
-            let currentTime = date.toLocaleTimeString()
-            socket.emit('showCup', currentTime)
+            socket.emit('showCup', reactionTime)
+            stopwatch.start()
         }, delay * 1000)
-
-
     })
 
-    // Listen for game started, recieve current time game started
-
     // Listen for cup clicked, recieve current time cup was clicked
-    // Measure reaction time between started and clicked
-    // Emit reaction time to the client
+    socket.on('cupClicked', () => {
+        // Measure reactiontime
+        stopwatch.stop()
+        let reactionTime = Math.floor(stopwatch.getTime()).toString()
+        console.log("Reaction time:", reactionTime)
+        stopwatch.reset()
+
+        // Randomise position
+
+        // Randomise delay 
+        const delay = randomiseDelay()
+
+        // After delay, get the current time and emit to client
+        setTimeout(() => {
+            socket.emit('showCup', reactionTime)
+            stopwatch.start()
+        }, delay * 1000)
+    })
 }
+
+/**
+ * Randomise a number to use as delay in setTimeouts
+ * @returns a random number between 1 - 5
+ */
+const randomiseDelay = () => {
+    return Math.floor(Math.random() * 6) + 1
+}
+
+/**
+ * Get the current time
+ * @returns time in 00:00:00 format
+ */
+
+

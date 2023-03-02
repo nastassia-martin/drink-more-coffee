@@ -86,38 +86,27 @@ socket.on('playerReady', (user) => {
      * START GAME
      */
     document.querySelector('.start-game-btn')?.addEventListener('click', e => {
-        let x = 4
-        let y = 6
+        const player1Clock = document.querySelector('#player-1-clock')
+        const player2Clock = document.querySelector('#player-2-clock')
 
         // Let the server know the game is started and players are ready
-        socket.emit('startGame', x, y)
+        socket.emit('startGame')
 
         // Listen for when cup should show, gives us the current time
-        socket.on('showCup', (currentTime) => {
+        socket.on('showCup', (reactionTime) => {
             // INSERT COFFEE CUP 
-
             document.querySelector('#game-grid')!.innerHTML = `<button id="test">Testknapp</button>`
-            console.log("Current time:", currentTime)
-
-
 
 
             /**
              * Listen for clicks on coffee cup
              */
             document.querySelector('#test')?.addEventListener('click', (e) => {
-                // Emit the current time when cup is clicked
-                // @ todo Emit the current time when game is starting
-                console.log('test')
+                // Emit that the cup is clicked
+                socket.emit('cupClicked')
+                document.querySelector('#game-grid')!.innerHTML = ``
+                player1Clock!.innerHTML = `${reactionTime}`
             })
-
-
         })
     })
 })
-
-
-
-// Listen for reaction time
-
-// Write out result
