@@ -30,7 +30,7 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     // Save nickname and emit to the server
     const user: User = {
         id: socket.id,
-        nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value
+        nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value.trim()
     }
 
     // If nothing was entered/created, tell user and return
@@ -99,7 +99,7 @@ socket.on('playerReady', (user) => {
         // Listen for when cup should show, gives us the current time
         socket.on('showCup', (width, height) => {
             // INSERT COFFEE CUP 
-            document.querySelector('#game-grid')!.innerHTML = `<img src="/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+            document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
             let coffee = document.querySelector('.coffee') as HTMLImageElement
             coffee.style.left = width + 'px'
             coffee.style.top = height + 'px'

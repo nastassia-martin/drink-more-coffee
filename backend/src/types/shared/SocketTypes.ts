@@ -13,7 +13,7 @@ export interface ClientToServerEvents {
 export type User = {
     id: string
     nickname: string
-    roomId?: string
+    gammeroomId?: string
 }
 
 export type GameRoom = {
