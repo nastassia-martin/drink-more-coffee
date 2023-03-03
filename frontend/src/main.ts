@@ -95,9 +95,7 @@ socket.on('playerReady', (user) => {
             document.querySelector('#game-grid')!.innerHTML = `<button id="test">Testknapp</button>`
             startTimer()
 
-            /**
-             * Listen for clicks on coffee cup
-             */
+            // Listen for clicks on coffee cup
             document.querySelector('#test')?.addEventListener('click', (e) => {
                 // Emit that the cup is clicked
                 socket.emit('cupClicked')
