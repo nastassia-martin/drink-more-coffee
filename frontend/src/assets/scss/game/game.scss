@@ -8,6 +8,11 @@ $ff-header: 'Annie Use Your Telescope', cursive;
 
 .player-container {
     font-family: $ff-main;
+
+    .player-1-clock,
+    .player-2-clock {
+        font-size: 20px;
+    }
 }
 
 #game-grid {
