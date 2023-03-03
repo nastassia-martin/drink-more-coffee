@@ -120,7 +120,8 @@ socket.on('playerReady', (user) => {
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
-let playerClock = document.querySelector('#player-2-clock')
+let player1Clock = document.querySelector('#player-1-clock')
+let player2Clock = document.querySelector('#player-2-clock')
 let int: any = null
 
 const startTimer = () => {
@@ -133,7 +134,8 @@ const startTimer = () => {
 const resetTimer = () => {
     clearInterval(int);
     [tenth, seconds, minutes] = [0, 0, 0]
-    playerClock!.innerHTML = '00 : 00 : 00'
+    player1Clock!.innerHTML = '00 : 00 : 00'
+    player2Clock!.innerHTML = '00 : 00 : 00'
 }
 
 const displayTimer = () => {
@@ -147,9 +149,10 @@ const displayTimer = () => {
         }
     }
 
-    let m: string | number = minutes < 10 ? '0' + minutes : minutes;
-    let s: string | number = seconds < 10 ? '0' + seconds : seconds;
-    let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth;
-    playerClock!.innerHTML = ` ${m} : ${s} : ${t}`;
+    let m: string | number = minutes < 10 ? '0' + minutes : minutes
+    let s: string | number = seconds < 10 ? '0' + seconds : seconds
+    let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth
+    player1Clock!.innerHTML = ` ${m} : ${s} : ${t}`
+    player2Clock!.innerHTML = ` ${m} : ${s} : ${t}`
 }
 
