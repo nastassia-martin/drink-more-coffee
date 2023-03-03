@@ -7,7 +7,12 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
     startGame: (positionX: number, positionY: number) => void
-    cupClicked: (positionX: number, positionY: number) => void
+    cupClicked: (
+        positionX: number,
+        positionY: number,
+        reactionPlayer1: string,
+        reactionPlayer2: string
+    ) => void
 }
 
 export type User = {

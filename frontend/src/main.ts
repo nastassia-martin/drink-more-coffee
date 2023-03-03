@@ -109,8 +109,13 @@ socket.on('playerReady', (user) => {
             document.querySelector('#coffee-virus')?.addEventListener('click', () => {
                 y = gameGrid.offsetHeight
                 x = gameGrid.offsetWidth
+
+                // Get the reaction time from each player
+                const reactionPlayer1 = player1Clock?.innerHTML
+                const reactionPlayer2 = player2Clock?.innerHTML
+
                 // Emit that the cup is clicked
-                socket.emit('cupClicked', x, y)
+                socket.emit('cupClicked', x, y, reactionPlayer1, reactionPlayer2)
                 document.querySelector('#game-grid')!.innerHTML = ``
                 resetTimer()
             })
@@ -132,6 +137,7 @@ const startTimer = () => {
 }
 
 const resetTimer = () => {
+    // Clear timer
     clearInterval(int);
     [tenth, seconds, minutes] = [0, 0, 0]
     player1Clock!.innerHTML = '00 : 00 : 00'
@@ -155,4 +161,5 @@ const displayTimer = () => {
     player1Clock!.innerHTML = ` ${m} : ${s} : ${t}`
     player2Clock!.innerHTML = ` ${m} : ${s} : ${t}`
 }
+
 

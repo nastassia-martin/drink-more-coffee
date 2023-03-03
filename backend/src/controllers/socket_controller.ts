@@ -35,12 +35,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         if (playerWaiting) {
             // Emit playerWaiting to the client
-            debug('player waiting emit')
             socket.emit('playerWaiting', user)
         } else {
             socket.emit('playerReady', user)
             // Emit playerReady to the client
-            debug('player ready emit')
             socket.broadcast.emit('playerReady', user)
         }
     })
@@ -50,9 +48,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         // Randomise position
         let width = Math.floor(Math.random() * x)
-        debug('width', width)
         let height = Math.floor(Math.random() * y)
-        debug('height', height)
 
         // Randomise delay 
         const delay = randomiseDelay()
@@ -64,14 +60,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', (x, y) => {
+    socket.on('cupClicked', (x, y, reactionPlayer1, reactionPlayer2) => {
         // Measure reactiontime
+        calculateReactionTime(reactionPlayer1)
+        calculateReactionTime(reactionPlayer2)
 
         // Randomise position
         let width = Math.floor(Math.random() * x)
-        debug('width', width)
         let height = Math.floor(Math.random() * y)
-        debug('height', height)
 
         // Randomise delay 
         const delay = randomiseDelay()
@@ -81,6 +77,22 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             socket.emit('showCup', width, height)
         }, delay * 1000)
     })
+}
+
+/**
+ * Calculate reaction time in tenth seconds
+ */
+const calculateReactionTime = (time: string) => {
+    const tenth1 = time.slice(10)
+    const sec1 = time.slice(5, 8)
+    const min1 = time.slice(0, 3)
+    let total: number
+
+    if (min1) {
+        // en minut = 60 sekunder
+        // 60 sekunder = 600 tenth
+        total = 600 * Number(min1)
+    }
 }
 
 /**
