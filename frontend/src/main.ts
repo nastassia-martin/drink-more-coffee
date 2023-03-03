@@ -86,9 +86,6 @@ socket.on('playerReady', (user) => {
      * START GAME
      */
     document.querySelector('.start-game-btn')?.addEventListener('click', e => {
-        const player1Clock = document.querySelector('#player-1-clock')
-        const player2Clock = document.querySelector('#player-2-clock')
-
         // Let the server know the game is started and players are ready
         socket.emit('startGame')
 
@@ -96,7 +93,7 @@ socket.on('playerReady', (user) => {
         socket.on('showCup', (reactionTime) => {
             // INSERT COFFEE CUP 
             document.querySelector('#game-grid')!.innerHTML = `<button id="test">Testknapp</button>`
-
+            startTimer()
 
             /**
              * Listen for clicks on coffee cup
@@ -105,8 +102,44 @@ socket.on('playerReady', (user) => {
                 // Emit that the cup is clicked
                 socket.emit('cupClicked')
                 document.querySelector('#game-grid')!.innerHTML = ``
-                player1Clock!.innerHTML = `${reactionTime}`
+                resetTimer()
             })
         })
     })
 })
+
+// ** Measure reaction time and display timer ** 
+let [tenth, seconds, minutes] = [0, 0, 0]
+let playerClock = document.querySelector('#player-2-clock')
+let int: any = null
+
+const startTimer = () => {
+    if (int !== null) {
+        clearInterval(int)
+    }
+    int = setInterval(displayTimer, 100)
+}
+
+const resetTimer = () => {
+    clearInterval(int);
+    [tenth, seconds, minutes] = [0, 0, 0]
+    playerClock!.innerHTML = '00 : 00 : 00'
+}
+
+const displayTimer = () => {
+    tenth += 10;
+    if (tenth == 100) {
+        tenth = 0;
+        seconds++;
+        if (seconds == 60) {
+            seconds = 0;
+            minutes++;
+        }
+    }
+
+    let m: string | number = minutes < 10 ? '0' + minutes : minutes;
+    let s: string | number = seconds < 10 ? '0' + seconds : seconds;
+    let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth;
+    playerClock!.innerHTML = ` ${m} : ${s} : ${t}`;
+}
+
