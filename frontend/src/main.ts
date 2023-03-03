@@ -111,8 +111,8 @@ socket.on('playerReady', (user) => {
                 x = gameGrid.offsetWidth
 
                 // Get the reaction time from each player
-                const reactionPlayer1 = player1Clock?.innerHTML
-                const reactionPlayer2 = player2Clock?.innerHTML
+                const reactionPlayer1 = player1Clock!.innerHTML
+                const reactionPlayer2 = player2Clock!.innerHTML
 
                 // Emit that the cup is clicked
                 socket.emit('cupClicked', x, y, reactionPlayer1, reactionPlayer2)

@@ -5,9 +5,6 @@ import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/Sock
 import { Socket } from 'socket.io'
 import { createUser, updateUser } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { Stopwatch } from "ts-stopwatch";
-
-const stopwatch = new Stopwatch()
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -62,8 +59,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     // Listen for cup clicked, recieve current time cup was clicked
     socket.on('cupClicked', (x, y, reactionPlayer1, reactionPlayer2) => {
         // Measure reactiontime
-        calculateReactionTime(reactionPlayer1)
-        calculateReactionTime(reactionPlayer2)
+        const reactionTime1 = calculateReactionTime(reactionPlayer1)
+        const reactionTime2 = calculateReactionTime(reactionPlayer2)
 
         // Randomise position
         let width = Math.floor(Math.random() * x)
@@ -83,16 +80,18 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
  * Calculate reaction time in tenth seconds
  */
 const calculateReactionTime = (time: string) => {
-    const tenth1 = time.slice(10)
-    const sec1 = time.slice(5, 8)
-    const min1 = time.slice(0, 3)
-    let total: number
+    // Get the values from 00 : 00 : 00 format
+    const min = time.slice(0, 3)
+    const sec = time.slice(5, 8)
+    const tenth = time.slice(10)
 
-    if (min1) {
-        // en minut = 60 sekunder
-        // 60 sekunder = 600 tenth
-        total = 600 * Number(min1)
-    }
+    // Add the values to total
+    let total: number = 0
+    if (min) total = 600 * Number(min)
+    if (sec) total = total + (60 * Number(sec))
+    if (tenth) total = total + (Number(tenth))
+
+    return total
 }
 
 /**
@@ -102,10 +101,4 @@ const calculateReactionTime = (time: string) => {
 const randomiseDelay = () => {
     return Math.floor(Math.random() * 6) + 1
 }
-
-/**
- * Get the current time
- * @returns time in 00:00:00 format
- */
-
 
