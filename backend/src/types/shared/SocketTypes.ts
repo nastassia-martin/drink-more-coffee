@@ -1,13 +1,13 @@
 export interface ServerToClientEvents {
-    showCup: (reactionTime: string) => void
+    showCup: (width: number, height: number) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
 }
 
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
-    startGame: () => void
-    cupClicked: () => void
+    startGame: (positionX: number, positionY: number) => void
+    cupClicked: (positionX: number, positionY: number) => void
 }
 
 export type User = {

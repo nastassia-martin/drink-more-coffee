@@ -35,47 +35,49 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         if (playerWaiting) {
             // Emit playerWaiting to the client
+            debug('player waiting emit')
             socket.emit('playerWaiting', user)
         } else {
             // Emit playerReady to the client
+            debug('player ready emit')
             socket.emit('playerReady', user)
         }
     })
 
-    // Listen for game starting, recieve positions
-    socket.on('startGame', () => {
-        // Randomise position
+    socket.on('startGame', (x, y) => {
+        debug('startGame recieved from the client')
 
-        // Set start time
-        const reactionTime = `00:00:00`
+        // Randomise position
+        let width = Math.floor(Math.random() * x)
+        debug('width', width)
+        let height = Math.floor(Math.random() * y)
+        debug('height', height)
 
         // Randomise delay 
         const delay = randomiseDelay()
 
         // After delay, get the current time and emit to client
         setTimeout(() => {
-            socket.emit('showCup', reactionTime)
-            stopwatch.start()
+            socket.emit('showCup', width, height)
         }, delay * 1000)
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', () => {
+    socket.on('cupClicked', (x, y) => {
         // Measure reactiontime
-        stopwatch.stop()
-        let reactionTime = Math.floor(stopwatch.getTime()).toString()
-        console.log("Reaction time:", reactionTime)
-        stopwatch.reset()
 
         // Randomise position
+        let width = Math.floor(Math.random() * x)
+        debug('width', width)
+        let height = Math.floor(Math.random() * y)
+        debug('height', height)
 
         // Randomise delay 
         const delay = randomiseDelay()
 
         // After delay, get the current time and emit to client
         setTimeout(() => {
-            socket.emit('showCup', reactionTime)
-            stopwatch.start()
+            socket.emit('showCup', width, height)
         }, delay * 1000)
     })
 }

@@ -47,7 +47,6 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
      */
     document.querySelector('.start-container')!.classList.add('hide')
     document.querySelector('.lobby-container')!.classList.remove('hide')
-
 })
 
 /**
@@ -85,20 +84,33 @@ socket.on('playerReady', (user) => {
     /**
      * START GAME
      */
-    document.querySelector('.start-game-btn')?.addEventListener('click', e => {
+    document.querySelector('.start-game-btn')?.addEventListener('click', () => {
+        const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
+        let y = gameGrid.offsetHeight
+        let x = gameGrid.offsetWidth
+
         // Let the server know the game is started and players are ready
-        socket.emit('startGame')
+        socket.emit('startGame', x, y)
+
+        // Hide the lobby & show the game room
+        document.querySelector('.lobby-container')!.classList.add('hide')
+        document.querySelector('.game-room-container')!.classList.remove('hide')
 
         // Listen for when cup should show, gives us the current time
-        socket.on('showCup', (reactionTime) => {
+        socket.on('showCup', (width, height) => {
             // INSERT COFFEE CUP 
-            document.querySelector('#game-grid')!.innerHTML = `<button id="test">Testknapp</button>`
+            document.querySelector('#game-grid')!.innerHTML = `<img src="/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+            let coffee = document.querySelector('.coffee') as HTMLImageElement
+            coffee.style.left = width + 'px'
+            coffee.style.top = height + 'px'
             startTimer()
 
             // Listen for clicks on coffee cup
-            document.querySelector('#test')?.addEventListener('click', (e) => {
+            document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+                y = gameGrid.offsetHeight
+                x = gameGrid.offsetWidth
                 // Emit that the cup is clicked
-                socket.emit('cupClicked')
+                socket.emit('cupClicked', x, y)
                 document.querySelector('#game-grid')!.innerHTML = ``
                 resetTimer()
             })
