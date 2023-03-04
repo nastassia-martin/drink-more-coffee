@@ -73,6 +73,7 @@ socket.on('playerWaiting', (user) => {
     <h2 class="lobby-heading2">Motpelare inte redo...</h2>
     `
     })
+
 })
 
 /**
@@ -81,6 +82,7 @@ socket.on('playerWaiting', (user) => {
 socket.on('playerReady', () => {
     // document.querySelector('.lobby-btn')!.addEventListener('click', () => {
     console.log('Player is ready')
+
     document.querySelector('.heading-center')!.innerHTML =
         `<h2 class="lobby-heading">Laddar spel.....</h2>
         <div class="gif-img">
@@ -129,8 +131,8 @@ socket.on('playerReady', () => {
             })
         })
     }, 4000)
-    // })
 })
+// })
 
 
 // ** Measure reaction time and display timer ** 
