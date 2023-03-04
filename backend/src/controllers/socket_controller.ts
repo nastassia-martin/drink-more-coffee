@@ -37,6 +37,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             socket.emit('playerReady', user)
             // Emit playerReady to the client
             socket.broadcast.emit('playerReady', user)
+            debug('both players are ready')
         }
     })
 

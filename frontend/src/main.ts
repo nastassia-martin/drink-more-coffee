@@ -79,12 +79,17 @@ socket.on('playerWaiting', (user) => {
  * If another user connected, show "spelare redo"
  */
 socket.on('playerReady', () => {
-    document.querySelector('.lobby-btn')!.addEventListener('click', () => {
-        console.log('Player is ready')
-        document.querySelector('.heading-center')!.innerHTML =
-            `<h2 class="lobby-heading">Laddar spel.....</h2>
+    // document.querySelector('.lobby-btn')!.addEventListener('click', () => {
+    console.log('Player is ready')
+    document.querySelector('.heading-center')!.innerHTML =
+        `<h2 class="lobby-heading">Laddar spel.....</h2>
+        <div class="gif-img">
+      <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
+    </div>
     `
-
+    // set timeout before game starts
+    setTimeout(() => {
+        console.log("Delayed for 4 seconds.")
         /**
          * START GAME
          */
@@ -123,9 +128,10 @@ socket.on('playerReady', () => {
                 resetTimer()
             })
         })
-
-    })
+    }, 4000)
+    // })
 })
+
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
