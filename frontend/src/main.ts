@@ -47,6 +47,8 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
      */
     document.querySelector('.start-container')!.classList.add('hide')
     document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.lobby-btn')!.classList.remove('hide')
+
 })
 
 /**
@@ -60,31 +62,32 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
  * If no other user connected, show "väntar på spelare"
  */
 socket.on('playerWaiting', (user) => {
-    console.log('Player is waiting')
-    document.querySelector('.heading-center')!.innerHTML =
-        `<h2 class="lobby-heading">${user.nickname} väntar på motspelare...</h2>
+    // Add the event listener for button in lobby
+    document.querySelector('.lobby-btn')!.addEventListener('click', () => {
+        console.log('Player is waiting')
+        document.querySelector('.heading-center')!.innerHTML =
+            `<h2 class="lobby-heading">${user.nickname} väntar på motspelare...</h2>
     <div class="gif-img">
       <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
     </div>
     <h2 class="lobby-heading2">Motpelare inte redo...</h2>
-    <button disabled type="submit" class="btn start-game-btn mt-4">Starta spel</button>
     `
+    })
 })
 
 /**
  * If another user connected, show "spelare redo"
  */
-socket.on('playerReady', (user) => {
-    console.log('Player is ready')
-    document.querySelector('.heading-center')!.innerHTML =
-        `<h2 class="lobby-heading">${user.nickname} ready..</h2>
-        <button type="submit" class="btn start-game-btn mt-4">Starta spel</button>
+socket.on('playerReady', () => {
+    document.querySelector('.lobby-btn')!.addEventListener('click', () => {
+        console.log('Player is ready')
+        document.querySelector('.heading-center')!.innerHTML =
+            `<h2 class="lobby-heading">Laddar spel.....</h2>
     `
 
-    /**
-     * START GAME
-     */
-    document.querySelector('.start-game-btn')?.addEventListener('click', () => {
+        /**
+         * START GAME
+         */
         const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
         let y = gameGrid.offsetHeight
         let x = gameGrid.offsetWidth
@@ -120,6 +123,7 @@ socket.on('playerReady', (user) => {
                 resetTimer()
             })
         })
+
     })
 })
 
