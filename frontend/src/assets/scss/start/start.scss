@@ -57,4 +57,18 @@ $ff-header: 'Annie Use Your Telescope', cursive;
             border-radius: 15px;
         }
     }
+
+    .to-lobby-btn {
+        width: 80%;
+        height: 50px;
+        background-color: #7FA2C3;
+        color: #FFF;
+        text-transform: uppercase;
+        font-size: 20px;
+        border-radius: 15px;
+        font-family: $ff-main;
+        text-transform: none;
+        border: none;
+        margin: 20px;
+    }
 }

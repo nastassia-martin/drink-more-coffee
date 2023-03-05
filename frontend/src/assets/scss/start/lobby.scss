@@ -3,7 +3,7 @@ $ff-main: 'Cairo', sans-serif;
 $ff-header: 'Annie Use Your Telescope', cursive;
 $ff-h2: 'Reenie Beanie';
 
-.lobby-container {
+.search-lobby-container {
     background-color: #E7A7A5;
     height: 100vh;
     width: 100vw;
@@ -20,19 +20,18 @@ $ff-h2: 'Reenie Beanie';
         margin-right: auto;
     }
 
-    .lobby-content {
+    .search-lobby-content {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
+        justify-content: center;
         padding: 2rem;
 
-        .lobby-heading {
+        .search-lobby-heading {
             font-family: $ff-h2;
             text-align: center;
             padding-bottom: 2rem;
         }
 
-        .lobby-heading2 {
+        .search-lobby-heading2 {
             padding-top: 4rem;
             font-family: $ff-h2;
             text-align: center;
@@ -54,7 +53,7 @@ $ff-h2: 'Reenie Beanie';
             }
         }
 
-        .lobby-btn {
+        .search-player-btn {
             width: 100%;
             height: 70px;
             background-color: #7FA2C3;

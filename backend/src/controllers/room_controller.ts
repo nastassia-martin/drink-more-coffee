@@ -49,6 +49,7 @@ export const checkAvailableRooms = async (user: User) => {
         if (availableRoomFound) {
             const users = rooms.map(room => room.users)
             const singleUser = users.find(user => user.length < 2)
+
             if (singleUser) return singleUser[0].gameroomId
         } else return await addRoom(user)
     }
@@ -75,6 +76,7 @@ export const checkPlayerStatus = async () => {
         if (availableRoomFound) {
             const users = rooms.map(room => room.users)
             const singleUser = users.find(user => user.length < 2)
+
             if (singleUser) return playerWaiting = false
         } else return playerWaiting = true
     }
