@@ -13,6 +13,17 @@ import { GameRoom, User } from '../types/shared/SocketTypes'
 } */
 
 /**
+ * Get one user 
+ */
+export const getUser = async (socketId: string) => {
+    return await prisma.user.findUnique({
+        where: {
+            id: socketId
+        }
+    })
+}
+
+/**
  * Get users in Gameroom
  */
 export const getUsersInGameroom = async (gameroom: GameRoom) => {

@@ -3,7 +3,7 @@ const debug = Debug('chat:socket_controller')
 
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
-import { createUser, updateUser } from '../service/user_service'
+import { createUser, getUser, getUsersInGameroom, updateUser } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -58,10 +58,15 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', (x, y, reactionPlayer1, reactionPlayer2) => {
+    socket.on('cupClicked', async (x, y, reactionPlayer1, reactionPlayer2) => {
         // Measure reactiontime
         const reactionTime1 = calculateReactionTime(reactionPlayer1)
         const reactionTime2 = calculateReactionTime(reactionPlayer2)
+
+        // Get roomId by users socket ID + roomID 
+        // Emit broadcast to showcup 
+        const user = await getUser(socket.id)
+        let gameroomId: string | string[]
 
         // Randomise position
         let width = Math.floor(Math.random() * x)
@@ -70,10 +75,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         // Randomise delay 
         const delay = randomiseDelay()
 
-        // After delay, get the current time and emit to client
-        setTimeout(() => {
-            socket.emit('showCup', width, height)
-        }, delay * 1000)
+        // After delay, get the current time and emit to clien  
+        if (user?.gameroomId) {
+            gameroomId = user.gameroomId
+
+            setTimeout(() => {
+                socket.broadcast.to(gameroomId).emit('showCup', width, height)
+            }, delay * 1000)
+        }
     })
 }
 
