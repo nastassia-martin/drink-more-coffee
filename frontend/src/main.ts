@@ -18,13 +18,6 @@ socket.on('disconnect', () => {
 
 // @todo Add listen for reconnect ?
 
-
-/**
- * @todo WHEN 'gå vidare' is clicked, submit user to database
- * Put user in a room, max 2 users at once
- * validate nickname
- *  */
-
 document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.lobby-container')!.classList.remove('hide')
     document.querySelector('.start-container')!.classList.add('hide')
@@ -64,20 +57,12 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 
 })
 
-/**
- * When "Gå tillbaka till start" btn clicked, go to start view
- */
-// document.querySelector('.go-back-btn')?.addEventListener('click', () => {
-//     document.querySelector('.start-container')!.classList.remove('hide')
-// })
 document.querySelector('.game-room-container')!.classList.add('hide')
 
 /**
  * If no other user connected, show "väntar på spelare"
  */
 socket.on('playerWaiting', (user) => {
-    // Add the event listener for button in lobby
-    // document.querySelector('.search-player-btn')!.addEventListener('click', () => {
     console.log('Player is waiting')
     document.querySelector('.waiting-page')!.innerHTML =
         `<h2 class="search-lobby-heading">${user.nickname} väntar på motspelare...</h2>
@@ -94,11 +79,10 @@ socket.on('playerWaiting', (user) => {
  * If another user connected, show "spelare redo"
  */
 socket.on('playerReady', () => {
-    // document.querySelector('.lobby-btn')!.addEventListener('click', () => {
     console.log('Player is ready')
 
     document.querySelector('.waiting-page')!.innerHTML =
-        `<h2 class="search-lobby-heading">Laddar spel.....</h2>
+        `<h2 class="search-lobby-heading">Hittade motspelare! Laddar spel.....</h2>
         <div class="gif-img">
       <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
     </div>
@@ -121,7 +105,6 @@ socket.on('playerReady', () => {
         socket.emit('startGame', x, y)
 
         // Hide the lobby & show the game room
-        // document.querySelector('.search-lobby-container')!.classList.add('hide')
         document.querySelector('.game-room-container')!.classList.remove('hide')
 
         // Listen for when cup should show, gives us the current time
@@ -150,7 +133,6 @@ socket.on('playerReady', () => {
         })
     }, 4000)
 })
-// })
 
 
 // ** Measure reaction time and display timer ** 
