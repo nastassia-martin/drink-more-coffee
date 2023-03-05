@@ -37,22 +37,6 @@ $ff-h2: 'Reenie Beanie';
             text-align: center;
         }
 
-        .white-column {
-            font-family: $ff-main;
-            background-color: #F7E6E2;
-            height: 70vh;
-            width: 20%;
-            text-align: center;
-            border-radius: 15px;
-            padding: 1rem;
-            box-shadow: 5px 5px 15px 0px #00000040;
-
-            h3 {
-                font-size: 1.5rem;
-                padding: 1rem;
-            }
-        }
-
         .search-player-btn {
             width: 100%;
             height: 70px;
@@ -81,12 +65,45 @@ $ff-h2: 'Reenie Beanie';
         border: 2px solid #7FA2C3;
         color: #7FA2C3;
     }
-
 }
 
-.lobby-container .lobby-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
+.lobby-container {
+    height: 100vh;
+    overflow: hidden;
+
+    .go-back-btn {
+        font-family: $ff-h2;
+        background-color: transparent;
+        border-radius: 8px;
+        margin-left: 2rem;
+        padding: 0.5rem;
+        border: 2px solid black;
+        color: black;
+        font-size: 1.2rem;
+    }
+
+    .lobby-content {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 2rem;
+
+        .white-column {
+            font-family: "Cairo", sans-serif;
+            background-color: #F7E6E2;
+            height: 70vh;
+            width: 30%;
+            text-align: center;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 5px 5px 15px 0px rgb(0 0 0 / 25%);
+
+            .h3 {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+        }
+    }
+
 }

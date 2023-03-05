@@ -27,7 +27,15 @@ socket.on('disconnect', () => {
 
 document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
+
     console.log('click')
+})
+
+document.querySelector('.go-back-btn')?.addEventListener('click', () => {
+    document.querySelector('.start-container')!.classList.remove('hide')
+    document.querySelector('.lobby-container')!.classList.add('hide')
+
 })
 
 document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
@@ -59,9 +67,9 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 /**
  * When "Gå tillbaka till start" btn clicked, go to start view
  */
-document.querySelector('.go-back-btn')?.addEventListener('click', () => {
-    document.querySelector('.start-container')!.classList.remove('hide')
-})
+// document.querySelector('.go-back-btn')?.addEventListener('click', () => {
+//     document.querySelector('.start-container')!.classList.remove('hide')
+// })
 document.querySelector('.game-room-container')!.classList.add('hide')
 
 /**
