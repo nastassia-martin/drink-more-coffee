@@ -21,8 +21,6 @@ socket.on('disconnect', () => {
 document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.lobby-container')!.classList.remove('hide')
     document.querySelector('.start-container')!.classList.add('hide')
-
-    console.log('click')
 })
 
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
@@ -37,7 +35,8 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     // Save nickname and emit to the server
     const user: User = {
         id: socket.id,
-        nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value.trim()
+        nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value.trim(),
+        reactionTime: null
     }
 
     // If nothing was entered/created, tell user and return
@@ -122,11 +121,10 @@ socket.on('playerReady', () => {
                 x = gameGrid.offsetWidth
 
                 // Get the reaction time from each player
-                const reactionPlayer1 = player1Clock!.innerHTML
-                const reactionPlayer2 = player2Clock!.innerHTML
+                const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
                 // Emit that the cup is clicked
-                socket.emit('cupClicked', x, y, reactionPlayer1, reactionPlayer2)
+                socket.emit('cupClicked', x, y, reactionTime)
                 document.querySelector('#game-grid')!.innerHTML = ``
                 resetTimer()
             })

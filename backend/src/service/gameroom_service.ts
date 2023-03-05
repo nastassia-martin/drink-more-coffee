@@ -17,6 +17,19 @@ export const getRooms = async () => {
 }
 
 /**
+ * Get a specific room
+ */
+export const getRoom = async (gameroomId: string) => {
+    return await prisma.gameroom.findUnique({
+        where: {
+            id: gameroomId
+        }, include: {
+            users: true
+        }
+    })
+}
+
+/**
  * Create room 
  */
 export const createRoom = async (room: GameRoom, user: User) => {

@@ -3,31 +3,28 @@ const debug = Debug('chat:socket_controller')
 
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
-import { createUser, getUser, getUsersInGameroom, updateUser } from '../service/user_service'
+import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
+import { getRoom } from '../service/gameroom_service'
+import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
 
     // Listen for user created
     socket.on('userJoin', async (user) => {
-        debug('User incoming from client:', user)
-
         // Create the incoming user in the database 
         await createUser(user)
 
         // Get the id of the Gameroom user are supposed to enter
         const availableRoomId = await checkAvailableRooms(user)
-        debug('AvailableRoomId:', availableRoomId)
 
         if (availableRoomId) {
             // Connect user to gameroom 
-            const createdUser = await updateUser(user, availableRoomId)
-            debug('Created user:', createdUser)
+            await updateUser(user, availableRoomId)
 
             // Add user to gameroom available
             socket.join(availableRoomId)
-            debug('Joined available room')
         }
 
         // Check if there is an player waiting or not, returns true/false
@@ -61,36 +58,49 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             gameroomId = user.gameroomId
 
             setTimeout(() => {
-                socket.broadcast.emit('showCup', width, height)
+                socket.broadcast.to(gameroomId).emit('showCup', width, height)
             }, delay * 1000)
         }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionPlayer1, reactionPlayer2) => {
+    socket.on('cupClicked', async (x, y, reactionTime) => {
         // Measure reactiontime
-        const reactionTime1 = calculateReactionTime(reactionPlayer1)
-        const reactionTime2 = calculateReactionTime(reactionPlayer2)
+        const reactionTimeTotal = calculateReactionTime(reactionTime)
+        debug('reactiontime:', reactionTime, socket.id)
 
-        // Get roomId by users socket ID + roomID 
-        // Emit broadcast to showcup 
+        // Send reactionTime to database 
+        await updateReactionTime(socket.id, reactionTimeTotal)
+
         const user = await getUser(socket.id)
-        let gameroomId: string | string[]
+        const gameroomId = user?.gameroomId
 
-        // Randomise position
-        let width = Math.floor(Math.random() * x)
-        let height = Math.floor(Math.random() * y)
+        const checkIfAnswered = async () => {
+            // Get room the game is in
+            if (gameroomId) {
+                const room = await getRoom(gameroomId)
 
-        // Randomise delay 
-        const delay = randomiseDelay()
+                // Get the users in that room 
+                const users = room?.users
 
-        // After delay, get the current time and emit to clien  
-        if (user?.gameroomId) {
-            gameroomId = user.gameroomId
+                // If both users reactionTime is set, callback to main that its ok to go on
+                const answered = users?.filter(user => user.reactionTime != null)
 
-            setTimeout(() => {
-                socket.broadcast.emit('showCup', width, height)
-            }, delay * 1000)
+                if (answered?.length === 2) {
+                    // Randomise position
+                    let width = Math.floor(Math.random() * x)
+                    let height = Math.floor(Math.random() * y)
+
+                    // Randomise delay 
+                    const delay = randomiseDelay()
+
+                    // After delay, get the current time and emit to clien  
+                    setTimeout(() => {
+                        socket.emit('showCup', width, height)
+                    }, delay * 1000)
+                } else { checkIfAnswered() }
+                debug(answered)
+            }
         }
     })
 }

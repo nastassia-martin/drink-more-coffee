@@ -10,14 +10,14 @@ export interface ClientToServerEvents {
     cupClicked: (
         positionX: number,
         positionY: number,
-        reactionPlayer1: string,
-        reactionPlayer2: string
+        reactionTime: string
     ) => void
 }
 
 export type User = {
     id: string
     nickname: string
+    reactionTime: number | null
     gameroomId?: string | null
 }
 

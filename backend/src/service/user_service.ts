@@ -58,3 +58,13 @@ export const updateUser = async (user: User, gameroomId: string) => {
         }
     })
 }
+
+/**
+ * Update user with ReactionTime
+ */
+export const updateReactionTime = async (userId: string, reactionTime: number) => {
+    return await prisma.user.update({
+        where: { id: userId },
+        data: { reactionTime }
+    })
+}
