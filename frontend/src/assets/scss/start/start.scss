@@ -58,17 +58,24 @@ $ff-header: 'Annie Use Your Telescope', cursive;
         }
     }
 
-    .to-lobby-btn {
-        width: 80%;
-        height: 50px;
-        background-color: #7FA2C3;
-        color: #FFF;
-        text-transform: uppercase;
-        font-size: 20px;
-        border-radius: 15px;
-        font-family: $ff-main;
-        text-transform: none;
-        border: none;
-        margin: 20px;
+    .to-lobby-btn-div {
+        display: flex;
+        justify-content: center;
+        padding-top: 10px;
+
+
+        .to-lobby-btn {
+            width: 50%;
+            height: 50px;
+            background-color: #7FA2C3;
+            color: #FFF;
+            text-transform: uppercase;
+            font-size: 20px;
+            border-radius: 15px;
+            font-family: $ff-main;
+            text-transform: none;
+            border: none;
+        }
     }
+
 }
