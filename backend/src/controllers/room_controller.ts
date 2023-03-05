@@ -77,7 +77,7 @@ export const checkPlayerStatus = async () => {
             const users = rooms.map(room => room.users)
             const singleUser = users.find(user => user.length < 2)
 
-            if (singleUser) return playerWaiting = false
-        } else return playerWaiting = true
+            if (singleUser) return playerWaiting = true
+        } else return playerWaiting = false
     }
 }

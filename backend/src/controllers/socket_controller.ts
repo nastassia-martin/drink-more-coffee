@@ -18,13 +18,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         // Get the id of the Gameroom user are supposed to enter
         const availableRoomId = await checkAvailableRooms(user)
+        debug('AvailableRoomId:', availableRoomId)
 
         if (availableRoomId) {
             // Connect user to gameroom 
-            await updateUser(user, availableRoomId)
+            const createdUser = await updateUser(user, availableRoomId)
+            debug('Created user:', createdUser)
 
             // Add user to gameroom available
             socket.join(availableRoomId)
+            debug('Joined available room')
         }
 
         // Check if there is an player waiting or not, returns true/false
@@ -34,15 +37,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Emit playerWaiting to the client
             socket.emit('playerWaiting', user)
         } else {
-            socket.emit('playerReady', user)
             // Emit playerReady to the client
+            socket.emit('playerReady', user)
             socket.broadcast.emit('playerReady', user)
-            debug('both players are ready')
         }
     })
 
-    socket.on('startGame', (x, y) => {
-        debug('startGame recieved from the client')
+    socket.on('startGame', async (x, y) => {
+        // Get roomId by users socket ID + roomID 
+        // Emit broadcast to showcup 
+        const user = await getUser(socket.id)
+        let gameroomId: string | string[]
 
         // Randomise position
         let width = Math.floor(Math.random() * x)
@@ -51,10 +56,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         // Randomise delay 
         const delay = randomiseDelay()
 
-        // After delay, get the current time and emit to client
-        setTimeout(() => {
-            socket.emit('showCup', width, height)
-        }, delay * 1000)
+        // After delay, get the current time and emit to clien  
+        if (user?.gameroomId) {
+            gameroomId = user.gameroomId
+
+            setTimeout(() => {
+                socket.broadcast.emit('showCup', width, height)
+            }, delay * 1000)
+        }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
@@ -80,7 +89,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             gameroomId = user.gameroomId
 
             setTimeout(() => {
-                socket.broadcast.to(gameroomId).emit('showCup', width, height)
+                socket.broadcast.emit('showCup', width, height)
             }, delay * 1000)
         }
     })
