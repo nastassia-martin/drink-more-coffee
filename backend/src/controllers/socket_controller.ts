@@ -18,92 +18,91 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         // Get the id of the Gameroom user are supposed to enter
         const availableRoomId = await checkAvailableRooms(user)
-
-        if (availableRoomId) {
-            // Connect user to gameroom 
-            await updateUser(user, availableRoomId)
-
-            // Add user to gameroom available
-            socket.join(availableRoomId)
+        if (!availableRoomId) {
+            return
         }
+
+        // Connect user to gameroom 
+        await updateUser(user, availableRoomId)
+
+        // Add user to gameroom available
+        socket.join(availableRoomId)
 
         // Check if there is an player waiting or not, returns true/false
         const playerWaiting = await checkPlayerStatus()
-
-        if (playerWaiting) {
+        if (playerWaiting && availableRoomId) {
             // Emit playerWaiting to the client
             socket.emit('playerWaiting', user)
         } else {
             // Emit playerReady to the client
             socket.emit('playerReady', user)
-            socket.broadcast.emit('playerReady', user)
+            socket.broadcast.to(availableRoomId).emit('playerReady', user)
         }
     })
 
-    socket.on('startGame', async (x, y) => {
-        // Get roomId by users socket ID + roomID 
-        // Emit broadcast to showcup 
+    socket.on('startGame', async (x, y, callback) => {
+        // Get the current gameroomId
         const user = await getUser(socket.id)
-        let gameroomId: string | string[]
+        const gameroomId = user?.gameroomId
 
-        // Randomise position
-        let width = Math.floor(Math.random() * x)
-        let height = Math.floor(Math.random() * y)
+        if (gameroomId) {
+            const room = await getRoom(gameroomId)
 
-        // Randomise delay 
-        const delay = randomiseDelay()
+            if (room) {
+                debug('hittade room')
+                callback({
+                    success: true,
+                    data: {
+                        name: room?.name,
+                        users: room?.users
+                    }
+                })
+            }
 
-        // After delay, get the current time and emit to clien  
-        if (user?.gameroomId) {
-            gameroomId = user.gameroomId
+            // Randomise position
+            let width = Math.floor(Math.random() * x)
+            let height = Math.floor(Math.random() * y)
 
+            // Randomise delay 
+            const delay = randomiseDelay()
+
+            // After delay, get the current time and emit to clien  
             setTimeout(() => {
-                socket.broadcast.to(gameroomId).emit('showCup', width, height)
+                socket.to(gameroomId).emit('showCup', width, height)
             }, delay * 1000)
         }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
     socket.on('cupClicked', async (x, y, reactionTime) => {
+        // Get the current gameroomId
+        const user = await getUser(socket.id)
+        const gameroomId = user?.gameroomId
+
         // Measure reactiontime
         const reactionTimeTotal = calculateReactionTime(reactionTime)
-        debug('reactiontime:', reactionTime, socket.id)
 
         // Send reactionTime to database 
         await updateReactionTime(socket.id, reactionTimeTotal)
 
-        const user = await getUser(socket.id)
-        const gameroomId = user?.gameroomId
+        // Get room the game is in
+        if (gameroomId) {
+            // Randomise position
+            let width = Math.floor(Math.random() * x)
+            let height = Math.floor(Math.random() * y)
 
-        const checkIfAnswered = async () => {
-            // Get room the game is in
-            if (gameroomId) {
-                const room = await getRoom(gameroomId)
+            // Randomise delay 
+            const delay = randomiseDelay()
 
-                // Get the users in that room 
-                const users = room?.users
-
-                // If both users reactionTime is set, callback to main that its ok to go on
-                const answered = users?.filter(user => user.reactionTime != null)
-
-                if (answered?.length === 2) {
-                    // Randomise position
-                    let width = Math.floor(Math.random() * x)
-                    let height = Math.floor(Math.random() * y)
-
-                    // Randomise delay 
-                    const delay = randomiseDelay()
-
-                    // After delay, get the current time and emit to clien  
-                    setTimeout(() => {
-                        socket.emit('showCup', width, height)
-                    }, delay * 1000)
-                } else { checkIfAnswered() }
-                debug(answered)
-            }
+            // After delay, get the current time and emit to clien  
+            setTimeout(() => {
+                socket.to(gameroomId).emit('showCup', width, height)
+            }, delay * 1000)
         }
+        //}
     })
 }
+
 
 /**
  * Calculate reaction time in tenth seconds

@@ -6,7 +6,8 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
-    startGame: (positionX: number, positionY: number) => void
+    getGamerooms: (callback: (result: GetGameroomResult) => void) => void
+    startGame: (positionX: number, positionY: number, callback: (result: GetGameroomResult) => void) => void
     cupClicked: (
         positionX: number,
         positionY: number,
@@ -24,7 +25,10 @@ export type User = {
 export type GameRoom = {
     id?: string
     name: string
-    connectedUser: boolean
     users: User[] | null
 }
 
+export interface GetGameroomResult {
+    success: boolean,
+    data: GameRoom | null
+}

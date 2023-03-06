@@ -16,19 +16,90 @@ socket.on('disconnect', () => {
     console.log('Disconnected from the server')
 })
 
-// @todo Add listen for reconnect ?
-
-document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
-    document.querySelector('.lobby-container')!.classList.remove('hide')
-    document.querySelector('.start-container')!.classList.add('hide')
+// Listen for if player waiting
+socket.on('playerWaiting', (user) => {
+    // Display waiting page
+    displayPlayerWaiting(user)
 })
 
-document.querySelector('.go-back-btn')?.addEventListener('click', () => {
-    document.querySelector('.start-container')!.classList.remove('hide')
-    document.querySelector('.lobby-container')!.classList.add('hide')
+// Listen for if player is ready
+socket.on('playerReady', () => {
+    // Display ready page
+    displayPlayerReady()
 
+    // Emit to server that the game is ready to start
+    socket.emit('startGame', x, y, (gameroom) => {
+        console.log('rooms:', gameroom)
+
+        // Display players name
+        const users = gameroom.data?.users
+        if (users) {
+            document.querySelector('#player-1-name')!.innerHTML = `${users[0].nickname}`
+            document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
+        }
+    })
 })
 
+
+const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
+let y = gameGrid.offsetHeight
+let x = gameGrid.offsetWidth
+
+
+/*  // Let the server know the game is started and players are ready
+ // Listen for when cup should show, gives us the current time
+ socket.on('showCup', (width, height) => {
+     // INSERT COFFEE CUP 
+     document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+     let coffee = document.querySelector('.coffee') as HTMLImageElement
+     coffee.style.left = width + 'px'
+     coffee.style.top = height + 'px'
+     startTimer()
+
+     // Listen for clicks on coffee cup
+     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+         y = gameGrid.offsetHeight
+         x = gameGrid.offsetWidth
+
+         // Get the reaction time from each player
+         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
+
+         // Emit that the cup is clicked
+         socket.emit('cupClicked', x, y, reactionTime)
+         document.querySelector('#game-grid')!.innerHTML = ``
+         resetTimer()
+     })
+ }) */
+
+
+// ** Display waiting page **
+const displayPlayerWaiting = (user: User) => {
+    document.querySelector('.waiting-page')!.innerHTML =
+        `<h2 class="search-lobby-heading">${user.nickname} väntar på motspelare...</h2>
+    <div class="gif-img">
+      <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
+    </div>
+    <h2 class="search-lobby-heading2">Motpelare inte redo...</h2>
+    `
+}
+
+// ** Display ready page **
+const displayPlayerReady = () => {
+    document.querySelector('.waiting-page')!.innerHTML =
+        `<h2 class="search-lobby-heading">Hittade motspelare! Laddar spel.....</h2>
+        <div class="gif-img">
+      <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
+    </div>
+    `
+
+    // Hide the lobby & show the game room after 4sec delay
+    setTimeout(() => {
+        document.querySelector('.game-room-container')!.classList.remove('hide')
+        document.querySelector('.search-lobby-container')!.classList.add('hide')
+    }, 4000)
+}
+
+// ** Get username and emit to server ** 
 document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     e.preventDefault()
 
@@ -48,90 +119,22 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     // Emit user joined to the server
     socket.emit('userJoin', user)
 
-    /**
-     * When "gå vidare" button clicked, go to lobby
-     */
+    // When "gå vidare" button clicked, go to lobby
     document.querySelector('.start-container')!.classList.add('hide')
     document.querySelector('.search-lobby-container')!.classList.remove('hide')
-
 })
 
-document.querySelector('.game-room-container')!.classList.add('hide')
-
-/**
- * If no other user connected, show "väntar på spelare"
- */
-socket.on('playerWaiting', (user) => {
-    console.log('Player is waiting')
-    document.querySelector('.waiting-page')!.innerHTML =
-        `<h2 class="search-lobby-heading">${user.nickname} väntar på motspelare...</h2>
-    <div class="gif-img">
-      <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
-    </div>
-    <h2 class="search-lobby-heading2">Motpelare inte redo...</h2>
-    `
+// ** Hide start-view and display lobby **
+document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
+    document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
 })
 
-// })
-
-/**
- * If another user connected, show "spelare redo"
- */
-socket.on('playerReady', () => {
-    console.log('Player is ready')
-
-    document.querySelector('.waiting-page')!.innerHTML =
-        `<h2 class="search-lobby-heading">Hittade motspelare! Laddar spel.....</h2>
-        <div class="gif-img">
-      <iframe src="https://giphy.com/embed/3oriNLCq45I9mdJK1y" class="gif-img" allowFullScreen></iframe>
-    </div>
-    `
-    // set timeout before game starts
-    setTimeout(() => {
-        console.log("Delayed for 4 seconds.")
-        /**
-         * START GAME
-         */
-        document.querySelector('.search-lobby-container')!.classList.add('hide')
-        document.querySelector('.game-room-container')!.classList.remove('hide')
-
-
-        const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
-        let y = gameGrid.offsetHeight
-        let x = gameGrid.offsetWidth
-
-        // Let the server know the game is started and players are ready
-        socket.emit('startGame', x, y)
-
-        // Hide the lobby & show the game room
-        document.querySelector('.game-room-container')!.classList.remove('hide')
-
-        // Listen for when cup should show, gives us the current time
-        socket.on('showCup', (width, height) => {
-            // INSERT COFFEE CUP 
-            document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-            let coffee = document.querySelector('.coffee') as HTMLImageElement
-            coffee.style.left = width + 'px'
-            coffee.style.top = height + 'px'
-            startTimer()
-
-            // Listen for clicks on coffee cup
-            document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-                y = gameGrid.offsetHeight
-                x = gameGrid.offsetWidth
-
-                // Get the reaction time from each player
-                const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
-
-                // Emit that the cup is clicked
-                socket.emit('cupClicked', x, y, reactionTime)
-                document.querySelector('#game-grid')!.innerHTML = ``
-                resetTimer()
-            })
-        })
-    }, 4000)
+// ** If 'tillbaka till start' pressed, hide lobby and show start-view ** 
+document.querySelector('.go-back-btn')?.addEventListener('click', () => {
+    document.querySelector('.start-container')!.classList.remove('hide')
+    document.querySelector('.lobby-container')!.classList.add('hide')
 })
-
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]

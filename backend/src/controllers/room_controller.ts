@@ -16,7 +16,6 @@ const addRoom = async (user: User) => {
     // Create a room object
     const newRoom: GameRoom = {
         name: `Gameroom #${roomNr}`,
-        connectedUser: false,
         users: null
     }
 
