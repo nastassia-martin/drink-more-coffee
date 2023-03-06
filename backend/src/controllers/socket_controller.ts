@@ -47,7 +47,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         if (gameroomId) {
             const room = await getRoom(gameroomId)
-            const usersInRoom = room?.users.filter(user => user.reactionTime)
 
             if (room) {
                 debug('hittade room')
@@ -67,7 +66,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Randomise delay 
             const delay = randomiseDelay()
 
-            // After delay, get the current time and emit to clien  
+            // After delay, get the current time and emit to client
             setTimeout(() => {
                 io.in(gameroomId).emit('showCup', width, height)
             }, delay * 1000)
@@ -82,34 +81,32 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         // Get rooms
         if (gameroomId) {
-            const room = await getRoom(gameroomId)
-            const usersInRoom = room?.users.filter(user => user.reactionTime)
-
             // Measure reactiontime
             const reactionTimeTotal = calculateReactionTime(reactionTime)
 
             // Send reactionTime to database 
-            const updatedUser = await updateReactionTime(socket.id, reactionTimeTotal)
-            debug('users', usersInRoom)
+            await updateReactionTime(socket.id, reactionTimeTotal)
 
+            const room = await getRoom(gameroomId)
+            const usersInRoom = room?.users.filter(user => user.reactionTime)
+
+            // Find a way to count how many player answered
             if (usersInRoom?.length === 2) {
-                // Get room the game is in
-                if (gameroomId) {
-                    // Randomise position
-                    let width = Math.floor(Math.random() * x)
-                    let height = Math.floor(Math.random() * y)
+                // Randomise position
+                let width = Math.floor(Math.random() * x)
+                let height = Math.floor(Math.random() * y)
 
-                    // Randomise delay 
-                    const delay = randomiseDelay()
+                // Randomise delay 
+                const delay = randomiseDelay()
 
-                    // After delay, get the current time and emit to clien  
-                    setTimeout(() => {
-                        io.in(gameroomId).emit('showCup', width, height)
-                    }, delay * 1000)
-                }
-            } else {
-                return
+                // After delay, get the current time and emit to clien  
+                setTimeout(() => {
+                    io.in(gameroomId).emit('showCup', width, height)
+                }, delay * 1000)
             }
+
+
+            debug('users', usersInRoom)
         }
     })
 }

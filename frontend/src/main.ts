@@ -29,7 +29,6 @@ socket.on('playerWaiting', (user) => {
 
 // Listen for if player is ready
 socket.on('playerReady', () => {
-
     // Display ready page
     displayPlayerReady()
 
@@ -71,9 +70,6 @@ socket.on('showCup', (width, height) => {
         resetTimer()
     })
 })
-
-// listen for if two users emitted an event in a room
-
 
 // ** Display waiting page **
 const displayPlayerWaiting = (user: User) => {
