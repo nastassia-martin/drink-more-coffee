@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000
 
 // HTTP & Socket.IO server
 const server = http.createServer(app)
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
+export const io = new Server<ClientToServerEvents, ServerToClientEvents>(server, {
     cors: {
         origin: '*',
         credentials: true

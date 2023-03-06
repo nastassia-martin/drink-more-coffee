@@ -6,6 +6,11 @@ import { ClientToServerEvents, User, ServerToClientEvents } from '@backend/types
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
 
+// Get the coordinates for the grid
+const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
+let y = gameGrid.offsetHeight
+let x = gameGrid.offsetWidth
+
 // Listen for connection
 socket.on('connect', () => {
     console.log('Connected to the server', socket.id)
@@ -23,53 +28,50 @@ socket.on('playerWaiting', (user) => {
 })
 
 // Listen for if player is ready
-socket.on('playerReady', () => {
+socket.on('playerReady', (user) => {
+    const gameroomId = user.gameroomId
+
     // Display ready page
     displayPlayerReady()
 
+    // Get the coordinates and send to the server, to randomise position
+    y = gameGrid.offsetHeight
+    x = gameGrid.offsetWidth
+
     // Emit to server that the game is ready to start
     socket.emit('startGame', x, y, (gameroom) => {
-        console.log('rooms:', gameroom)
-
-        // Display players name
         const users = gameroom.data?.users
         if (users) {
+            // Display players name
             document.querySelector('#player-1-name')!.innerHTML = `${users[0].nickname}`
             document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
         }
     })
 })
 
+// Listen for when cup should show
+socket.on('showCup', (width, height) => {
+    // Show coffee cup on randomised position and start timer
+    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+    let coffee = document.querySelector('.coffee') as HTMLImageElement
+    coffee.style.left = width + 'px'
+    coffee.style.top = height + 'px'
+    startTimer()
 
-const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
-let y = gameGrid.offsetHeight
-let x = gameGrid.offsetWidth
+    // Listen for clicks on coffee cup
+    document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+        y = gameGrid.offsetHeight
+        x = gameGrid.offsetWidth
 
+        // Get the reaction time from each player
+        const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
-/*  // Let the server know the game is started and players are ready
- // Listen for when cup should show, gives us the current time
- socket.on('showCup', (width, height) => {
-     // INSERT COFFEE CUP 
-     document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-     let coffee = document.querySelector('.coffee') as HTMLImageElement
-     coffee.style.left = width + 'px'
-     coffee.style.top = height + 'px'
-     startTimer()
-
-     // Listen for clicks on coffee cup
-     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-         y = gameGrid.offsetHeight
-         x = gameGrid.offsetWidth
-
-         // Get the reaction time from each player
-         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
-
-         // Emit that the cup is clicked
-         socket.emit('cupClicked', x, y, reactionTime)
-         document.querySelector('#game-grid')!.innerHTML = ``
-         resetTimer()
-     })
- }) */
+        // Emit that the cup is clicked
+        socket.emit('cupClicked', x, y, reactionTime)
+        document.querySelector('#game-grid')!.innerHTML = ``
+        resetTimer()
+    })
+})
 
 
 // ** Display waiting page **

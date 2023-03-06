@@ -3,6 +3,7 @@ const debug = Debug('chat:socket_controller')
 
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
+import { io } from '../../server'
 import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 import { getRoom } from '../service/gameroom_service'
@@ -32,11 +33,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         const playerWaiting = await checkPlayerStatus()
         if (playerWaiting && availableRoomId) {
             // Emit playerWaiting to the client
-            socket.emit('playerWaiting', user)
+            io.in(availableRoomId).emit('playerWaiting', user)
         } else {
             // Emit playerReady to the client
-            socket.emit('playerReady', user)
-            socket.broadcast.to(availableRoomId).emit('playerReady', user)
+            io.in(availableRoomId).emit('playerReady', user)
         }
     })
 
@@ -68,7 +68,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // After delay, get the current time and emit to clien  
             setTimeout(() => {
-                socket.to(gameroomId).emit('showCup', width, height)
+                socket.emit('showCup', width, height)
             }, delay * 1000)
         }
     })
@@ -96,10 +96,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // After delay, get the current time and emit to clien  
             setTimeout(() => {
-                socket.to(gameroomId).emit('showCup', width, height)
+                socket.emit('showCup', width, height)
             }, delay * 1000)
         }
-        //}
     })
 }
 
