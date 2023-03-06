@@ -47,6 +47,8 @@ socket.on('playerReady', () => {
     })
 })
 
+let counter: number
+
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
     // Show coffee cup on randomised position and start timer
@@ -64,8 +66,12 @@ socket.on('showCup', (width, height) => {
         // Get the reaction time from each player
         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
+        counter++
+
+
         // Emit that the cup is clicked
-        socket.emit('cupClicked', x, y, reactionTime)
+        socket.emit('cupClicked', x, y, reactionTime, counter)
+
         document.querySelector('#game-grid')!.innerHTML = ``
         resetTimer()
     })

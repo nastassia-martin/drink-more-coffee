@@ -11,7 +11,8 @@ export interface ClientToServerEvents {
     cupClicked: (
         positionX: number,
         positionY: number,
-        reactionTime: string
+        reactionTime: string,
+        counter: number
     ) => void
 }
 
