@@ -66,15 +66,18 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Randomise delay 
             const delay = randomiseDelay()
 
+            const clicks = 0
+
             // After delay, get the current time and emit to client
             setTimeout(() => {
-                io.in(gameroomId).emit('showCup', width, height)
+                io.in(gameroomId).emit('showCup', width, height, clicks)
             }, delay * 1000)
         }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime, counter) => {
+    socket.on('cupClicked', async (x, y, reactionTime, clicks) => {
+
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -90,8 +93,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room = await getRoom(gameroomId)
             const usersInRoom = room?.users.filter(user => user.reactionTime)
 
-            debug('counter', counter)
-
             // Find a way to count how many player answered
             if (usersInRoom?.length === 2) {
                 // Randomise position
@@ -103,7 +104,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
                 // After delay, get the current time and emit to clien  
                 setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height)
+                    io.in(gameroomId).emit('showCup', width, height, clicks)
                 }, delay * 1000)
             }
         }
@@ -136,4 +137,5 @@ const calculateReactionTime = (time: string) => {
 const randomiseDelay = () => {
     return Math.floor(Math.random() * 6) + 1
 }
+
 

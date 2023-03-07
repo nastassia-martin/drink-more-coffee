@@ -21,6 +21,6 @@ när en runda är klar, visas bägges reaktionstid i timern?
 sen ändras antal rundor nedanför "rutan" och nästa runda startas? 
 
 
-
+// emit that im ready to go on to the other player
 
 

@@ -1,18 +1,17 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number) => void
+    showCup: (width: number, height: number, clicks: number) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
 }
 
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
-    getGamerooms: (callback: (result: GetGameroomResult) => void) => void
     startGame: (positionX: number, positionY: number, callback: (result: GetGameroomResult) => void) => void
     cupClicked: (
         positionX: number,
         positionY: number,
         reactionTime: string,
-        counter: number
+        clicks: number
     ) => void
 }
 
@@ -32,4 +31,8 @@ export type GameRoom = {
 export interface GetGameroomResult {
     success: boolean,
     data: GameRoom | null
+}
+
+export interface GetClicksResult {
+    clicks: number
 }
