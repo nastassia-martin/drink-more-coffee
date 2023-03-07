@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { getRoom } from '../service/gameroom_service'
+import { getRoom, updateRounds } from '../service/gameroom_service'
 import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -53,7 +53,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     success: true,
                     data: {
                         name: room?.name,
-                        users: room?.users
+                        users: room?.users,
+                        rounds: room?.rounds
                     }
                 })
             }
@@ -72,7 +73,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime) => {
+    socket.on('cupClicked', async (x, y, reactionTime, rounds) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -84,14 +85,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // Send reactionTime to database 
             await updateReactionTime(socket.id, reactionTimeTotal)
-
+            await updateRounds(gameroomId, rounds)
             const room = await getRoom(gameroomId)
+
             const usersAnswered = room?.users.filter(user => user.reactionTime)
-            debug('users in room', usersAnswered)
+            debug('users in room', usersAnswered, 'runda', rounds)
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
-                debug('both users has answered', usersArr)
 
                 // Randomise position
                 let width = Math.floor(Math.random() * x)

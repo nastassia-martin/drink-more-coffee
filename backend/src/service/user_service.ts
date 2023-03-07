@@ -64,8 +64,12 @@ export const updateUser = async (user: User, gameroomId: string) => {
  */
 export const updateReactionTime = async (userId: string, reactionTime: number) => {
     return await prisma.user.update({
-        where: { id: userId },
-        data: { reactionTime }
+        where: {
+            id: userId
+        },
+        data: {
+            reactionTime
+        }
     })
 }
 
