@@ -86,28 +86,26 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             await updateReactionTime(socket.id, reactionTimeTotal)
 
             const room = await getRoom(gameroomId)
-            const usersInRoom = room?.users.filter(user => user.reactionTime)
+            const usersAnswered = room?.users.filter(user => user.reactionTime)
+            debug('users in room', usersAnswered)
 
-            if (usersInRoom?.length === 2) {
-                let usersArr = usersInRoom?.map(user => user.reactionTime)
-                debug('users has answered', usersArr)
+            if (usersAnswered?.length === 2) {
+                let usersArr = usersAnswered?.filter(user => user.reactionTime)
+                debug('both users has answered', usersArr)
 
-                // If two players answered, emit showCup event
-                if (usersArr.length === 2) {
-                    // Randomise position
-                    let width = Math.floor(Math.random() * x)
-                    let height = Math.floor(Math.random() * y)
+                // Randomise position
+                let width = Math.floor(Math.random() * x)
+                let height = Math.floor(Math.random() * y)
 
-                    // Randomise delay 
-                    const delay = randomiseDelay()
+                // Randomise delay 
+                const delay = randomiseDelay()
 
-                    setTimeout(() => {
-                        io.in(gameroomId).emit('showCup', width, height)
-                    }, delay * 1000)
+                setTimeout(() => {
+                    io.in(gameroomId).emit('showCup', width, height)
+                }, delay * 1000)
 
-                    // Unset reactiontime in DB
-                    await updateReactionTime(socket.id, 0)
-                }
+                // Unset reactiontime in DB
+                await updateReactionTime(socket.id, 0)
             }
         }
     })
