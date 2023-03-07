@@ -24,3 +24,9 @@ sen ändras antal rundor nedanför "rutan" och nästa runda startas?
 // emit that im ready to go on to the other player
 
 
+
+
+
+//. FELSÖKNING 
+Vi får två st "showcup events" skickade till frontend, eftersom att vi skickar till roomId (vilket innehåller två st)
+

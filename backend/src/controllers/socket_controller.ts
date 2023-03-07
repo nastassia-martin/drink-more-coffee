@@ -49,7 +49,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room = await getRoom(gameroomId)
 
             if (room) {
-                debug('hittade room')
                 callback({
                     success: true,
                     data: {
@@ -68,16 +67,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             const clicks = 0
 
+            const opponent = room?.users.find(user => user.id !== socket.id)
+
             // After delay, get the current time and emit to client
-            setTimeout(() => {
-                io.in(gameroomId).emit('showCup', width, height, clicks)
-            }, delay * 1000)
+            if (!opponent) {
+                return
+            }
+
+            io.to(opponent?.id).emit('showCup', width, height, delay, clicks)
+            debug('startGame emit to frontend showcup:', clicks)
         }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
     socket.on('cupClicked', async (x, y, reactionTime, clicks) => {
-
+        debug('clicks recieved from client cupclicked', clicks)
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -94,19 +98,26 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const usersInRoom = room?.users.filter(user => user.reactionTime)
 
             // Find a way to count how many player answered
-            if (usersInRoom?.length === 2) {
-                // Randomise position
-                let width = Math.floor(Math.random() * x)
-                let height = Math.floor(Math.random() * y)
+            //if (clicks === 2) {
+            // Randomise position
+            let width = Math.floor(Math.random() * x)
+            let height = Math.floor(Math.random() * y)
 
-                // Randomise delay 
-                const delay = randomiseDelay()
+            // Randomise delay 
+            const delay = randomiseDelay()
 
-                // After delay, get the current time and emit to clien  
-                setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height, clicks)
-                }, delay * 1000)
+            const opponent = room?.users.find(user => user.id !== socket.id)
+            debug(opponent?.id)
+
+            // After delay, get the current time and emit to client
+            if (!opponent) {
+                return
             }
+
+            if (clicks === 2) {
+                io.to(opponent?.id).emit('showCup', width, height, delay, clicks)
+                debug('startGame emit to frontend showcup:', clicks)
+            } else (debug('clicks not 2, not sent'))
         }
     })
 }

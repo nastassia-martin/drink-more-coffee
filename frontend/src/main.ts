@@ -45,34 +45,41 @@ socket.on('playerReady', () => {
             document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
         }
     })
+    console.log('startgame emitted')
 })
 
 // Listen for when cup should show
-socket.on('showCup', (width, height, clicks) => {
+socket.on('showCup', (width, height, delay, clicks) => {
+    console.log('clicks recieved from startgame/showcup: ', clicks)
+    //if (clicks === 2 || clicks === 0) {
     // Show coffee cup on randomised position and start timer
-    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-    let coffee = document.querySelector('.coffee') as HTMLImageElement
-    coffee.style.left = width + 'px'
-    coffee.style.top = height + 'px'
-    startTimer()
+    setTimeout(() => {
+        document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+        let coffee = document.querySelector('.coffee') as HTMLImageElement
+        coffee.style.left = width + 'px'
+        coffee.style.top = height + 'px'
+        startTimer()
 
-    // Listen for clicks on coffee cup
-    document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-        y = gameGrid.offsetHeight
-        x = gameGrid.offsetWidth
+        // Listen for clicks on coffee cup
+        document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+            y = gameGrid.offsetHeight
+            x = gameGrid.offsetWidth
 
-        clicks++
-        console.log("clicks", clicks)
+            clicks++
+            console.log("clicks added by 1", clicks)
 
-        // Get the reaction time from each player
-        const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
+            // Get the reaction time from each player
+            const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
-        // Emit that the cup is clicked
-        socket.emit('cupClicked', x, y, reactionTime, clicks)
+            // Emit that the cup is clicked
+            socket.emit('cupClicked', x, y, reactionTime, clicks)
+            console.log("clicks emitted to cupclicked", clicks)
 
-        document.querySelector('#game-grid')!.innerHTML = ``
-        resetTimer()
-    })
+            document.querySelector('#game-grid')!.innerHTML = ``
+            resetTimer()
+        })
+    }, delay * 1000)
+    //}
 })
 
 // ** Display waiting page **

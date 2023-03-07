@@ -1,5 +1,5 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number, clicks: number) => void
+    showCup: (width: number, height: number, delay: number, clicks: number) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
 }
