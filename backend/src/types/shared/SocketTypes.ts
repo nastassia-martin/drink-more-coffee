@@ -1,7 +1,8 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number, delay: number, clicks: number) => void
+    showCup: (width: number, height: number) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
+    playersAnswered: (clicks: boolean) => void
 }
 
 export interface ClientToServerEvents {
@@ -10,8 +11,7 @@ export interface ClientToServerEvents {
     cupClicked: (
         positionX: number,
         positionY: number,
-        reactionTime: string,
-        clicks: number
+        reactionTime: string
     ) => void
 }
 
