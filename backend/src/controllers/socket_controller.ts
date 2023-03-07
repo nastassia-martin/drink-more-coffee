@@ -87,7 +87,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
-            debug('users in room', usersAnswered)
+            debug('usersAnswered', usersAnswered)
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
@@ -105,7 +105,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 }, delay * 1000)
 
                 // Unset reactiontime in DB
-                await updateReactionTime(socket.id, 0)
+                usersArr.forEach(async (user) => {
+                    await updateReactionTime(user.id, 0)
+                })
             }
         }
     })

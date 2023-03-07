@@ -60,12 +60,12 @@ socket.on('showCup', (width, height) => {
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+        // Get the reaction time from each player
+        const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
+
         pauseTimer()
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
-
-        // Get the reaction time from each player
-        const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
         // Emit that the cup is clicked
         socket.emit('cupClicked', x, y, reactionTime)
