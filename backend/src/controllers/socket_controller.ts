@@ -72,7 +72,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime) => {
+    socket.on('cupClicked', async (x, y, reactionTime, callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -107,6 +107,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Unset reactiontime in DB
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
+                })
+            } else if (usersAnswered?.length === 1) {
+                // callback with user answered to stop their timer? 
+                callback({
+                    success: true,
+                    data: {
+                        id: usersAnswered[0].id,
+                        nickname: usersAnswered[0].nickname,
+                        reactionTime: usersAnswered[0].reactionTime,
+                        gameroomId: usersAnswered[0].gameroomId
+                    }
                 })
             }
         }

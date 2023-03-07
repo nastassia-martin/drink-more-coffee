@@ -56,19 +56,30 @@ socket.on('showCup', (width, height) => {
     let coffee = document.querySelector('.coffee') as HTMLImageElement
     coffee.style.left = width + 'px'
     coffee.style.top = height + 'px'
-    startTimer()
+
+    // Start timer for both players
+    startTimer(player2Clock)
+    startTimer(player1Clock)
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
         // Get the reaction time from each player
         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
-        pauseTimer()
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
 
-        // Emit that the cup is clicked
-        socket.emit('cupClicked', x, y, reactionTime)
+        // Emit that the cup is clicked, get back result of who answered first
+        socket.emit('cupClicked', x, y, reactionTime, (userAnswered) => {
+            console.log(userAnswered)
+
+            const player1NameEl = document.querySelector('#player-1-name')
+            if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
+                // Stop player who answereds clock
+                pauseTimer(player1Clock, reactionTime)
+            }
+
+        })
 
         document.querySelector('#game-grid')!.innerHTML = ``
     })
@@ -140,30 +151,42 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
-let player1Clock = document.querySelector('#player-1-clock')
-let player2Clock = document.querySelector('#player-2-clock')
-let int: any = null
+let player1Clock = document.querySelector('#player-1-clock')! as HTMLElement
+let player2Clock = document.querySelector('#player-2-clock')! as HTMLElement
+let intPlayer1: any = null
+let intPlayer2: any = null
 
-const startTimer = () => {
-    if (int !== null) {
-        clearInterval(int)
+const startTimer = (playerClock: HTMLElement) => {
+    if (playerClock === player1Clock) {
+        if (intPlayer1 !== null) {
+            clearInterval(intPlayer1)
+        }
+        intPlayer1 = setInterval(() => displayTimer(playerClock), 100)
     }
-    int = setInterval(displayTimer, 100)
+    if (playerClock === player2Clock) {
+        if (intPlayer2 !== null) {
+            clearInterval(intPlayer2)
+        }
+        intPlayer2 = setInterval(() => displayTimer(playerClock), 100)
+    }
 }
 
-const pauseTimer = () => {
-    clearInterval(int)
+const pauseTimer = (playerClock: HTMLElement, reactionTime: string) => {
+    clearInterval(intPlayer1)
+    clearInterval(intPlayer2)
+    playerClock!.innerHTML = `${reactionTime}`
 }
 
 const resetTimer = () => {
     // Clear timer
-    clearInterval(int);
+    clearInterval(intPlayer1);
+    clearInterval(intPlayer2);
     [tenth, seconds, minutes] = [0, 0, 0]
     player1Clock!.innerHTML = '00 : 00 : 00'
     player2Clock!.innerHTML = '00 : 00 : 00'
 }
 
-const displayTimer = () => {
+const displayTimer = (playerClock: HTMLElement) => {
     tenth += 10;
     if (tenth == 100) {
         tenth = 0;
@@ -177,8 +200,7 @@ const displayTimer = () => {
     let m: string | number = minutes < 10 ? '0' + minutes : minutes
     let s: string | number = seconds < 10 ? '0' + seconds : seconds
     let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth
-    player1Clock!.innerHTML = ` ${m} : ${s} : ${t}`
-    player2Clock!.innerHTML = ` ${m} : ${s} : ${t}`
+    playerClock!.innerHTML = ` ${m} : ${s} : ${t}`
 }
 
 
