@@ -106,7 +106,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 }, delay * 1000)
 
                 // Unset reactiontime in DB
-                await updateReactionTime(socket.id, 0)
+                usersArr.forEach(async (user) => {
+                    await updateReactionTime(user.id, 0)
+                })
             }
         }
     })
