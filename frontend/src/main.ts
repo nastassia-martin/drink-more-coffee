@@ -70,12 +70,18 @@ const showRounds = () => {
 }
 
 // Listen for when cup should show
-socket.on('showCup', (width, height) => {
+socket.on('showCup', (width, height, userArr) => {
     // Remove the answered time and set elements back
     player1AnswerClock.classList.add('hide-timer')
     player1Clock.classList.remove('hide-timer')
     player2AnswerClock.classList.add('hide-timer')
     player2Clock.classList.remove('hide-timer')
+
+    if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
+        player1score.innerHTML = `${userArr[0].score}`
+    } else if (player2NameEl?.innerHTML === `${userArr[1].nickname}`) {
+        player2score.innerHTML = `${userArr[1].score}`
+    }
 
     resetTimer()
     // Show coffee cup on randomised position and start timer
@@ -100,36 +106,42 @@ socket.on('showCup', (width, height) => {
 
         // Emit that the cup is clicked, get back result of who answered first
         socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
-            // if userAnswered = 1, skriv ut nedan
-
-            if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
-                // change regular timer to hide
-                player1Clock.classList.add('hide-timer')
-                player1score.innerText === `${userAnswered.data?.score}`
-
-                // change innertext to reactiontime on answerclock
-                player1AnswerClock.classList.remove('hide-timer')
-                player1AnswerClock.innerText = `${reactionTime}`
-            } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
-                // change regular timer to hide
-                player2Clock.classList.add('hide-timer')
-                player2score.innerText === `${userAnswered.data?.score}`
-
-                // change innertext to reactiontime on answerclock
-                player2AnswerClock.classList.remove('hide-timer')
-                player2AnswerClock.innerText = `${reactionTime}`
-            } else if (!userAnswered.success) {
-                // If both answered, pause timer
-
-                pauseTimer()
+            console.log("length:", userAnswered.data?.length)
+            console.log("data:", userAnswered.data)
+            // if one user answered, stop their timer
+            if (userAnswered.data?.length === 1) {
+                if (player1NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
+                    player1Clock.classList.add('hide-timer')
+                    player1AnswerClock.classList.remove('hide-timer')
+                    player1AnswerClock.innerText = `${reactionTime}`
+                } else if (player2NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
+                    player2Clock.classList.add('hide-timer')
+                    player2AnswerClock.classList.remove('hide-timer')
+                    player2AnswerClock.innerText = `${reactionTime}`
+                }
             }
+            // when both users answered, pause both timers and write out both final times
+            else if (userAnswered.data?.length === 2) {
+                pauseTimer()
+                // Check who's timer is 
+                const player1 = userAnswered.data.find(user => user.nickname === player1NameEl?.innerHTML)
+                const player2 = userAnswered.data.find(user => user.nickname === player2NameEl?.innerHTML)
 
-            console.log('usersAnswered.data.users.length === 2')
-
-
-            // if userAnswered = 2, ta ut vem som svarade först och skriv ut dess tid
-
-
+                if (player1) {
+                    console.log(player1, 'player1')
+                    player1Clock.classList.add('hide-timer')
+                    player1AnswerClock.classList.remove('hide-timer')
+                    player1AnswerClock.innerText = `${player1.reactionTime}`
+                    if (player1.reactionTime) calculateReactionTime(player1.reactionTime)
+                }
+                if (player2) {
+                    console.log(player2, 'player2')
+                    player2Clock.classList.add('hide-timer')
+                    player2AnswerClock.classList.remove('hide-timer')
+                    player2AnswerClock.innerText = `${player2.reactionTime}`
+                    if (player2.reactionTime) calculateReactionTime(player2.reactionTime)
+                }
+            }
         })
     })
 })
@@ -151,7 +163,6 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
 
 socket.on('getInfoToLobby', (result) => {
     updateLobby(result)
-    console.log('got result', result)
 })
 
 // ** Update lobby DOM **
@@ -295,6 +306,23 @@ const displayTimer = () => {
     if (player2Clock) player2Clock.innerHTML = ` ${m} : ${s} : ${t}`;
 }
 
+/**
+ * Convert time from 123 format to 00 : 00 : 00
+ * @param time in tenth of seconds 
+ */
+const calculateReactionTime = (time: number) => {
+    // 1 sek = 60 tenth
+    // 1 min = 600 tenth
 
+    let total: number = 0
 
+    const seconds = Math.floor(time / 10)
+    const min = Math.floor(time / 600)
+    const tenthSeconds = time
 
+    if (min > 1) {
+
+    }
+
+    console.log('minutes:', minutes, 'seconds:', seconds, 'tenths:', tenthSeconds)
+}

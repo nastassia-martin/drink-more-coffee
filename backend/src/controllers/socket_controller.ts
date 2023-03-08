@@ -59,14 +59,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             }
 
+            let userArr = room?.users.filter(user => user.nickname)
+
             // Randomise position
             let width = Math.floor(Math.random() * x)
             let height = Math.floor(Math.random() * y)
 
             // Randomise delay 
             const delay = randomiseDelay()
+
             setTimeout(() => {
-                io.in(gameroomId).emit('showCup', width, height)
+                io.in(gameroomId).emit('showCup', width, height, userArr!)
             }, delay * 1000)
         }
     })
@@ -100,7 +103,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
                 if (rounds !== 11) {
                     setTimeout(() => {
-                        io.in(gameroomId).emit('showCup', width, height)
+                        io.in(gameroomId).emit('showCup', width, height, usersArr)
                     }, delay * 1000)
                 } else {
                     io.in(gameroomId).emit('gameOver', user)
@@ -112,11 +115,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
                 // Send callback false, to let the client know it should pause timer
                 callback({
-                    success: false,
-                    data: null
+                    success: true,
+                    data: usersArr
                 })
             } else if (usersAnswered?.length === 1) {
                 let user = usersAnswered?.find(user => user.nickname)
+                let userArr = usersAnswered.map(user => user)
 
                 if (user) {
                     if (user.score === null) {
@@ -128,13 +132,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     // callback with user answered to stop their timer? 
                     callback({
                         success: true,
-                        data: {
-                            id: user.id,
-                            nickname: user.nickname,
-                            reactionTime: user.reactionTime,
-                            gameroomId: user.gameroomId,
-                            score: user.score
-                        }
+                        data: userArr
                     })
                 }
             }
@@ -174,7 +172,10 @@ const calculateReactionTime = (time: string) => {
     // Get the values from 00 : 00 : 00 format
     const min = time.slice(0, 3)
     const sec = time.slice(5, 8)
-    const tenth = time.slice(10)
+
+    // TA UT EN SIFFRA OCH INTE TVÅ 
+    const tenth = time.slice(10, 12)
+    debug(tenth)
 
     // Add the values to total
     let total: number = 0
