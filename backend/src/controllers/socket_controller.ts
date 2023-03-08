@@ -4,7 +4,7 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
-import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
+import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
 import { check } from 'express-validator'
@@ -73,7 +73,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime, rounds, callback) => {
+    socket.on('cupClicked', async (x, y, reactionTime, rounds, score, callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -86,6 +86,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Send reactionTime to database 
             await updateReactionTime(socket.id, reactionTimeTotal)
             await updateRounds(gameroomId, rounds)
+            // Send score to database
+            await updateScore(socket.id, score)
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
             // debug('usersAnswered', usersAnswered)
@@ -101,16 +103,20 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
                 if (player1.reactionTime! < player2.reactionTime!) {
                     debug('winner is player 1')
-                    player1.score!++
+                    if (player1.score)
+                        player1.score++
                     //player1.score = 1
                     debug('player 1 score', player1.score)
                 } else {
                     debug('winner is player 2')
-                    player2.score!++
+                    if (player2.score)
+                        player2.score++
                     debug('player 2 score', player2.score)
                     debug('player2', player2)
                     // score++ for player2
                 }
+
+
 
                 // debug('both users has answered', usersArr)
 
@@ -122,7 +128,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 const delay = randomiseDelay()
 
                 setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height)
+                    io.in(gameroomId).emit('showCup', width, height,)
                 }, delay * 1000)
 
                 // Unset reactiontime in DB

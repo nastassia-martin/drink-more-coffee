@@ -77,3 +77,13 @@ export const updateReactionTime = async (userId: string, reactionTime: number) =
 /**
  * 
  */
+export const updateScore = async (userId: string, score: number) => {
+    return await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            score
+        }
+    })
+}

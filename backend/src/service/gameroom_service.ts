@@ -43,7 +43,8 @@ export const createRoom = async (room: GameRoom, user: User) => {
                     where: { id: user.id },
                     create: {
                         id: user.id,
-                        nickname: user.nickname
+                        nickname: user.nickname,
+                        score: user.score
                     }
                 }
             }
