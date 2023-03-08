@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, User, ServerToClientEvents } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -113,6 +113,7 @@ socket.on('showCup', (width, height) => {
                 // change regular timer to hide
                 player2Clock.classList.add('hide-timer')
                 player2score.innerText === `${userAnswered.data?.score}`
+
                 // change innertext to reactiontime on answerclock
                 player2AnswerClock.classList.remove('hide-timer')
                 player2AnswerClock.innerText = `${reactionTime}`
@@ -133,33 +134,44 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.lobby-container')!.classList.remove('hide')
     document.querySelector('.start-container')!.classList.add('hide')
 
-    socket.emit('goToLobby', (result) => {
-        // Get the users reactiontimes
+    // Get result from DB to print out information in lobby
+    socket.emit('getInfoToLobby', (result) => {
+        updateLobby(result)
+    })
+})
 
-        result.data?.forEach(room => {
-            if (room.users) {
-                // Write out ongoing games with nicknames and scores
-                document.querySelector('.ongoing-games-column')!.innerHTML += `
+socket.on('getInfoToLobby', (result) => {
+    updateLobby(result)
+    console.log('got result', result)
+})
+
+// ** Update lobby DOM **
+const updateLobby = (result: GetGameroomResultLobby) => {
+    document.querySelector('.ongoing-games-column')!.innerHTML = ``
+    document.querySelector('.highscore-column')!.innerHTML = ``
+
+    // Check that the scores updates in realtime
+    result.data?.forEach(room => {
+        if (room.users && room.users.length === 2) {
+            // Write out ongoing games with nicknames and scores
+            document.querySelector('.ongoing-games-column')!.innerHTML += `
                     <li class="ongoing-list">
                         <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
-                        <span>${room.users[0]} | SCORE 2</span>
+                        <span>${room.users[0].score} | ${room.users[1].score}</span>
                     </li>
                 `
-                // Write out highscores
-                document.querySelector('.highscore-column')!.innerHTML += `
+
+            // Write out highscores
+            document.querySelector('.highscore-column')!.innerHTML += `
                     <li class="highscore-list">
                         <span>NAME 1 | NAME 2</span>
                         <span>SCORE 1 | SCORE 2</span>
                     </li>
                 `
-            }
-        })
-
-        // Check that the scores updates in realtime
-
+        }
     })
+}
 
-})
 
 const gameOver = document.querySelector('.gameover-container')
 

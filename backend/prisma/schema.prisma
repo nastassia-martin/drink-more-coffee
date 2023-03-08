@@ -30,6 +30,7 @@ model Gameroom {
 }
 
 model Result {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  users User[]
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  reactionTimeAvg Int
+  users           User[]
 }

@@ -117,7 +117,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             } else if (usersAnswered?.length === 1) {
                 let user = usersAnswered?.find(user => user.nickname)
-                debug('user:', user)
 
                 if (user) {
                     if (user.score === null) {
@@ -142,9 +141,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             }
         }
+
+        // Get rooms and their users 
+        const rooms = await getRooms()
+
+        if (rooms) {
+            const result = {
+                success: true,
+                data: rooms
+            }
+
+            socket.broadcast.emit('getInfoToLobby', result)
+        }
     })
 
-    socket.on('goToLobby', async (callback) => {
+    socket.on('getInfoToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
 

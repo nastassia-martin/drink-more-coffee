@@ -4,6 +4,7 @@ export interface ServerToClientEvents {
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
     gameOver: (user: User) => void
+    getInfoToLobby: (result: GetGameroomResultLobby) => void
 }
 
 export interface ClientToServerEvents {
@@ -16,7 +17,7 @@ export interface ClientToServerEvents {
         rounds: number,
         callback: (result: GetUserResult) => void
     ) => void
-    goToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
+    getInfoToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
 }
 
 export type User = {
