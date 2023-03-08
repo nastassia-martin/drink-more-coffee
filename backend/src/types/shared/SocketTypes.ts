@@ -3,6 +3,7 @@ export interface ServerToClientEvents {
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
+    gameOver: (user: User) => void
 }
 
 export interface ClientToServerEvents {

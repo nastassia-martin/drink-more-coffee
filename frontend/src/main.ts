@@ -57,11 +57,6 @@ const showRounds = () => {
     roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
 }
 
-if (rounds === 3) {
-    document.querySelector('.game-room-container')?.classList.add('hide')
-    document.querySelector('.gameover-container')!.classList.remove('hide')
-}
-
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
     // Show coffee cup on randomised position and start timer
@@ -90,6 +85,11 @@ socket.on('showCup', (width, height) => {
         resetTimer()
     })
 
+})
+
+socket.on('gameOver', () => {
+    document.querySelector('.game-room-container')?.classList.add('hide')
+    document.querySelector('.gameover-container')!.classList.remove('hide')
 })
 
 // ** Display waiting page **

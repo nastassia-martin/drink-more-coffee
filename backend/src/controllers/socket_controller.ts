@@ -65,7 +65,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // Randomise delay 
             const delay = randomiseDelay()
-
             setTimeout(() => {
                 io.in(gameroomId).emit('showCup', width, height)
             }, delay * 1000)
@@ -101,10 +100,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height)
-                }, delay * 1000)
-
+                if (rounds !== 11) {
+                    setTimeout(() => {
+                        io.in(gameroomId).emit('showCup', width, height)
+                    }, delay * 1000)
+                } else {
+                    io.in(gameroomId).emit('gameOver', user)
+                }
                 // Unset reactiontime in DB
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
