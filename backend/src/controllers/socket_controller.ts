@@ -124,8 +124,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
                     let score = ++user.score
 
-                    const updated = await updateScore(user.id, score)
-                    debug('updated', updated, 'score:', score)
+                    const updated = await updateScore(user.id, user.score)
+                    debug('updated', updated, 'score:', user.score)
                 }
 
                 // callback with user answered to stop their timer? 
