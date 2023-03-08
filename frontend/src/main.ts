@@ -136,7 +136,7 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
                 document.querySelector('.ongoing-games-column')!.innerHTML += `
                     <li class="ongoing-list">
                         <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
-                        <span>SCORE 1 | SCORE 2</span>
+                        <span>${room.users[0]} | SCORE 2</span>
                     </li>
                 `
                 // Write out highscores
