@@ -108,6 +108,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
                 })
+
+                // Send callback false, to let the client know it should pause timer
+                callback({
+                    success: false,
+                    data: null
+                })
             } else if (usersAnswered?.length === 1) {
                 // callback with user answered to stop their timer? 
                 callback({
