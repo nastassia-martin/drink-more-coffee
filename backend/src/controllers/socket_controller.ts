@@ -99,7 +99,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds !== 2) {
+                if (rounds !== 11) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', width, height)
                     }, delay * 1000)
@@ -134,7 +134,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     socket.on('goToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
-        debug(rooms)
 
         if (rooms) {
             callback({
