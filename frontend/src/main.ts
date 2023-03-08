@@ -45,7 +45,6 @@ socket.on('playerReady', () => {
             document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
         }
     })
-    console.log('startgame emitted')
 })
 
 let rounds = 1
@@ -76,7 +75,6 @@ socket.on('showCup', (width, height) => {
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
         rounds++
-        console.log('antal rounds:', rounds)
 
         // Emit that the cup is clicked
         socket.emit('cupClicked', x, y, reactionTime, rounds)

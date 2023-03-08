@@ -89,7 +89,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room = await getRoom(gameroomId)
 
             const usersAnswered = room?.users.filter(user => user.reactionTime)
-            debug('users in room', usersAnswered, 'runda', rounds)
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
