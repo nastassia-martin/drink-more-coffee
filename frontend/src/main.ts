@@ -147,8 +147,8 @@ socket.on('getInfoToLobby', (result) => {
 
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
-    document.querySelector('.ongoing-games-column')!.innerHTML = ``
-    document.querySelector('.highscore-column')!.innerHTML = ``
+    document.querySelector('.ongoing-games-column')!.innerHTML = `<h3>Pågående spel</h3>`
+    document.querySelector('.highscore-column')!.innerHTML = `<h3>Highscores</h3>`
 
     // Check that the scores updates in realtime
     result.data?.forEach(room => {
