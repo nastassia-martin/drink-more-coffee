@@ -163,7 +163,21 @@ socket.on('gameOver', (user) => {
 
     gameOver!.innerHTML = `
     <h2>AND THE WINNER IS......</h2>
-    <h3>${user.nickname}</h3>
+    <h4>↓ HOVER ME ↓</h4>
+    <div class="letter-image">
+        <div class="animated-mail">
+            <div class="back-fold"></div>
+            <div class="letter">
+                <div class="letter-title">
+                    <h3>${user.nickname}</h3>
+                </div>
+            </div>
+            <div class="top-fold"></div>
+            <div class="body"></div>
+            <div class="left-fold"></div>
+        </div>
+        <div class="shadow"></div>
+    </div>
     `
 })
 

@@ -99,7 +99,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds !== 11) {
+                if (rounds !== 2) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', width, height)
                     }, delay * 1000)
