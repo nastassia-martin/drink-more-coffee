@@ -91,7 +91,7 @@ socket.on('showCup', (width, height) => {
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
         // Get the reaction time from each player
-        const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
+        const reactionTime = document.querySelector('.player-clock')!.innerHTML
 
         document.querySelector('#game-grid')!.innerHTML = ``
         y = gameGrid.offsetHeight
@@ -100,6 +100,8 @@ socket.on('showCup', (width, height) => {
 
         // Emit that the cup is clicked, get back result of who answered first
         socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
+            // if userAnswered = 1, skriv ut nedan
+
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')
@@ -108,7 +110,6 @@ socket.on('showCup', (width, height) => {
                 // change innertext to reactiontime on answerclock
                 player1AnswerClock.classList.remove('hide-timer')
                 player1AnswerClock.innerText = `${reactionTime}`
-
             } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player2Clock.classList.add('hide-timer')
@@ -119,8 +120,16 @@ socket.on('showCup', (width, height) => {
                 player2AnswerClock.innerText = `${reactionTime}`
             } else if (!userAnswered.success) {
                 // If both answered, pause timer
+
                 pauseTimer()
             }
+
+            console.log('usersAnswered.data.users.length === 2')
+
+
+            // if userAnswered = 2, ta ut vem som svarade först och skriv ut dess tid
+
+
         })
     })
 })
@@ -157,7 +166,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
             document.querySelector('.ongoing-games-column')!.innerHTML += `
                     <li class="ongoing-list">
                         <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
-                        <span>${room.users[0].score} | ${room.users[1].score}</span>
+                        <span>${room.users[0].score} - ${room.users[1].score}</span>
                     </li>
                 `
 
@@ -165,7 +174,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
             document.querySelector('.highscore-column')!.innerHTML += `
                     <li class="highscore-list">
                         <span>NAME 1 | NAME 2</span>
-                        <span>SCORE 1 | SCORE 2</span>
+                        <span>SCORE 1 - SCORE 2</span>
                     </li>
                 `
         }

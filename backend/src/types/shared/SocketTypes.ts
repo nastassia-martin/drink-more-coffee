@@ -49,3 +49,5 @@ export interface GetUserResult {
     success: boolean,
     data: User | null
 }
+
+

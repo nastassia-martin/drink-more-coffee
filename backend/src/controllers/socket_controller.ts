@@ -122,23 +122,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     if (user.score === null) {
                         user.score = 0
                     }
-
                     ++user.score
-
                     await updateScore(user.id, user.score)
-                }
 
-                // callback with user answered to stop their timer? 
-                callback({
-                    success: true,
-                    data: {
-                        id: usersAnswered[0].id,
-                        nickname: usersAnswered[0].nickname,
-                        reactionTime: usersAnswered[0].reactionTime,
-                        gameroomId: usersAnswered[0].gameroomId,
-                        score: usersAnswered[0].score
-                    }
-                })
+                    // callback with user answered to stop their timer? 
+                    callback({
+                        success: true,
+                        data: {
+                            id: user.id,
+                            nickname: user.nickname,
+                            reactionTime: user.reactionTime,
+                            gameroomId: user.gameroomId,
+                            score: user.score
+                        }
+                    })
+                }
             }
         }
 

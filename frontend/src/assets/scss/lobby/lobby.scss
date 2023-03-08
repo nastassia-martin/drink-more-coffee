@@ -105,6 +105,8 @@ $ff-h2: 'Reenie Beanie';
         }
 
         .ongoing-games-column {
+            overflow: scroll;
+
             .ongoing-list {
                 list-style: none;
                 display: flex;
@@ -117,6 +119,8 @@ $ff-h2: 'Reenie Beanie';
         }
 
         .highscore-column {
+            overflow: scroll;
+
             .highscore-list {
                 list-style: none;
                 display: flex;
