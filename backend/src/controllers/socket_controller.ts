@@ -73,7 +73,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime, rounds, score, callback) => {
+    socket.on('cupClicked', async (x, y, reactionTime, rounds, callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -86,39 +86,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Send reactionTime to database 
             await updateReactionTime(socket.id, reactionTimeTotal)
             await updateRounds(gameroomId, rounds)
-            // Send score to database
-            await updateScore(socket.id, score)
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
-            // debug('usersAnswered', usersAnswered)
-
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
-
-                const player1 = { ...usersAnswered?.[0] }
-                debug('player 1', player1)
-                const player2 = { ...usersAnswered?.[1] }
-                debug('player2', player2)
-
-                if (player1.reactionTime! < player2.reactionTime!) {
-                    debug('winner is player 1')
-                    if (player1.score)
-                        player1.score++
-                    //player1.score = 1
-                    debug('player 1 score', player1.score)
-                } else {
-                    debug('winner is player 2')
-                    if (player2.score)
-                        player2.score++
-                    debug('player 2 score', player2.score)
-                    debug('player2', player2)
-                    // score++ for player2
-                }
-
-
-
-                // debug('both users has answered', usersArr)
 
                 // Randomise position
                 let width = Math.floor(Math.random() * x)
@@ -142,6 +114,20 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     data: null
                 })
             } else if (usersAnswered?.length === 1) {
+                let user = usersAnswered?.find(user => user.nickname)
+                debug('user:', user)
+
+                if (user) {
+                    if (user.score === null) {
+                        user.score = 0
+                    }
+
+                    let score = ++user.score
+
+                    const updated = await updateScore(user.id, score)
+                    debug('updated', updated, 'score:', score)
+                }
+
                 // callback with user answered to stop their timer? 
                 callback({
                     success: true,

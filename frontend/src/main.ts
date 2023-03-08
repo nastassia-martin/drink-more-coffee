@@ -63,7 +63,6 @@ socket.on('playerReady', () => {
 let rounds = 1
 let roundsTotal = 10
 const roundsDisplay = document.querySelector(".rounds-div")
-let score = 0
 
 // Show current round
 const showRounds = () => {
@@ -98,11 +97,9 @@ socket.on('showCup', (width, height) => {
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
         rounds++
-        score++
-        console.log(score)
 
         // Emit that the cup is clicked, get back result of who answered first
-        socket.emit('cupClicked', x, y, reactionTime, rounds, score, (userAnswered) => {
+        socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')

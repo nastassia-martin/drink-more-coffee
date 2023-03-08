@@ -13,7 +13,6 @@ export interface ClientToServerEvents {
         positionY: number,
         reactionTime: string,
         rounds: number,
-        score: number,
         callback: (result: GetUserResult) => void
     ) => void
     goToLobby: (callback: (result: GetGameroomResult) => void) => void
