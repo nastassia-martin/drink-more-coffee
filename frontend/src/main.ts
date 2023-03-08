@@ -87,9 +87,16 @@ socket.on('showCup', (width, height) => {
 
 })
 
-socket.on('gameOver', () => {
-    document.querySelector('.game-room-container')?.classList.add('hide')
-    document.querySelector('.gameover-container')!.classList.remove('hide')
+const gameOver = document.querySelector('.gameover-container')
+
+socket.on('gameOver', (user) => {
+    gameOver!.classList.remove('hide')
+    document.querySelector('.game-room-container')!.classList.add('hide')
+
+    gameOver!.innerHTML = `
+    <h2>AND THE WINNER IS......</h2>
+    <h3>${user.nickname}</h3>
+    `
 })
 
 // ** Display waiting page **
