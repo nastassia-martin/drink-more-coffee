@@ -134,14 +134,12 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         const rooms = await getRooms()
         debug(rooms)
 
-        /* if (rooms) {
+        if (rooms) {
             callback({
                 success: true,
-                data: {
-
-                }
+                data: rooms
             })
-        } */
+        }
     })
 }
 

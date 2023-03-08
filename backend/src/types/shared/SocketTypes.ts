@@ -15,7 +15,7 @@ export interface ClientToServerEvents {
         rounds: number,
         callback: (result: GetUserResult) => void
     ) => void
-    goToLobby: (callback: (result: GetGameroomResult) => void) => void
+    goToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
 }
 
 export type User = {

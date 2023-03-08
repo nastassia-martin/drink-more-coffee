@@ -128,8 +128,29 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.add('hide')
 
     socket.emit('goToLobby', (result) => {
-        console.log(result)
-        resetTimer()
+        // Get the users reactiontimes
+
+        result.data?.forEach(room => {
+            if (room.users) {
+                // Write out ongoing games with nicknames and scores
+                document.querySelector('.ongoing-games-column')!.innerHTML += `
+                    <li class="ongoing-list">
+                        <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
+                        <span>SCORE 1 | SCORE 2</span>
+                    </li>
+                `
+                // Write out highscores
+                document.querySelector('.highscore-column')!.innerHTML += `
+                    <li class="highscore-list">
+                        <span>NAME 1 | NAME 2</span>
+                        <span>SCORE 1 | SCORE 2</span>
+                    </li>
+                `
+            }
+        })
+
+        // Check that the scores updates in realtime
+
     })
 })
 
