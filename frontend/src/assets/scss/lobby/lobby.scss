@@ -103,6 +103,31 @@ $ff-h2: 'Reenie Beanie';
             }
 
         }
+
+        .ongoing-games-column {
+            .ongoing-list {
+                list-style: none;
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    padding: 10px 0;
+                }
+            }
+        }
+
+        .highscore-column {
+            .highscore-list {
+                list-style: none;
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    padding: 10px 0;
+                }
+            }
+        }
+
     }
 
 }
