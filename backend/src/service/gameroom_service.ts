@@ -37,6 +37,7 @@ export const createRoom = async (room: GameRoom, user: User) => {
         data: {
             name: room.name,
             userConnected: true,
+            rounds: room.rounds,
             users: {
                 connectOrCreate: {
                     where: { id: user.id },
@@ -46,6 +47,17 @@ export const createRoom = async (room: GameRoom, user: User) => {
                     }
                 }
             }
+        }
+    })
+}
+
+export const updateRounds = async (gameroomId: string, rounds: number) => {
+    return await prisma.gameroom.update({
+        where: {
+            id: gameroomId
+        },
+        data: {
+            rounds: rounds
         }
     })
 }

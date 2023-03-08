@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { getRoom } from '../service/gameroom_service'
+import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
 import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -53,7 +53,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     success: true,
                     data: {
                         name: room?.name,
-                        users: room?.users
+                        users: room?.users,
+                        rounds: room?.rounds
                     }
                 })
             }
@@ -72,7 +73,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime) => {
+    socket.on('cupClicked', async (x, y, reactionTime, rounds, callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -84,7 +85,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // Send reactionTime to database 
             await updateReactionTime(socket.id, reactionTimeTotal)
-
+            await updateRounds(gameroomId, rounds)
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
             // debug('usersAnswered', usersAnswered)
@@ -128,8 +129,41 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
                 })
+
+                // Send callback false, to let the client know it should pause timer
+                callback({
+                    success: false,
+                    data: null
+                })
+            } else if (usersAnswered?.length === 1) {
+                // callback with user answered to stop their timer? 
+                callback({
+                    success: true,
+                    data: {
+                        id: usersAnswered[0].id,
+                        nickname: usersAnswered[0].nickname,
+                        reactionTime: usersAnswered[0].reactionTime,
+                        gameroomId: usersAnswered[0].gameroomId,
+                        score: usersAnswered[0].score
+                    }
+                })
             }
         }
+    })
+
+    socket.on('goToLobby', async (callback) => {
+        // Get rooms and their users 
+        const rooms = await getRooms()
+        debug(rooms)
+
+        /* if (rooms) {
+            callback({
+                success: true,
+                data: {
+
+                }
+            })
+        } */
     })
 }
 

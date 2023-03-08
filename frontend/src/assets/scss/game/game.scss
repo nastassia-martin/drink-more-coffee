@@ -9,8 +9,7 @@ $ff-header: 'Annie Use Your Telescope', cursive;
 .player-container {
     font-family: $ff-main;
 
-    .player-1-clock,
-    .player-2-clock {
+    .player-clock {
         font-size: 20px;
     }
 }
@@ -30,4 +29,9 @@ $ff-header: 'Annie Use Your Telescope', cursive;
     left: 0px;
     width: 60px;
     height: 60px;
+}
+
+.hide-timer {
+    display: none;
+    visibility: hidden;
 }

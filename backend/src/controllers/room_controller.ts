@@ -16,7 +16,8 @@ const addRoom = async (user: User) => {
     // Create a room object
     const newRoom: GameRoom = {
         name: `Gameroom #${roomNr}`,
-        users: null
+        users: null,
+        rounds: 0
     }
 
     // Create a room in db

@@ -11,8 +11,11 @@ export interface ClientToServerEvents {
     cupClicked: (
         positionX: number,
         positionY: number,
-        reactionTime: string
+        reactionTime: string,
+        rounds: number,
+        callback: (result: GetUserResult) => void
     ) => void
+    goToLobby: (callback: (result: GetGameroomResult) => void) => void
 }
 
 export type User = {
@@ -27,6 +30,7 @@ export type GameRoom = {
     id?: string
     name: string
     users: User[] | null
+    rounds: number
 }
 
 export interface GetGameroomResult {
@@ -34,6 +38,12 @@ export interface GetGameroomResult {
     data: GameRoom | null
 }
 
-export interface GetClicksResult {
-    clicks: number
+export interface GetGameroomResultLobby {
+    success: boolean,
+    data: GameRoom[] | null
+}
+
+export interface GetUserResult {
+    success: boolean,
+    data: User | null
 }

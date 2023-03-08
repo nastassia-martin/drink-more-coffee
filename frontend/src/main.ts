@@ -11,6 +11,14 @@ const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
 let y = gameGrid.offsetHeight
 let x = gameGrid.offsetWidth
 
+// Get the elements for stopwatches
+const player1NameEl = document.querySelector('#player-1-name')
+const player2NameEl = document.querySelector('#player-2-name')
+let player1Clock = document.querySelector('#player-1-clock') as HTMLElement
+let player2Clock = document.querySelector('#player-2-clock') as HTMLElement
+let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTMLElement
+let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
+
 // Listen for connection
 socket.on('connect', () => {
     console.log('Connected to the server', socket.id)
@@ -45,32 +53,83 @@ socket.on('playerReady', () => {
             document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
         }
     })
-    console.log('startgame emitted')
 })
+
+let rounds = 1
+let roundsTotal = 10
+const roundsDisplay = document.querySelector(".rounds-div")
+
+// Show current round
+const showRounds = () => {
+    roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
+}
 
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
+    // Remove the answered time and set elements back
+    player1AnswerClock.classList.add('hide-timer')
+    player1Clock.classList.remove('hide-timer')
+    player2AnswerClock.classList.add('hide-timer')
+    player2Clock.classList.remove('hide-timer')
+
     resetTimer()
     // Show coffee cup on randomised position and start timer
     document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
     let coffee = document.querySelector('.coffee') as HTMLImageElement
     coffee.style.left = width + 'px'
     coffee.style.top = height + 'px'
+
+    // Start timer for both players
     startTimer()
+    showRounds()
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
         // Get the reaction time from each player
         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
-        pauseTimer()
+        document.querySelector('#game-grid')!.innerHTML = ``
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
+        rounds++
 
-        // Emit that the cup is clicked
-        socket.emit('cupClicked', x, y, reactionTime)
+        // Emit that the cup is clicked, get back result of who answered first
+        socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
+            if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
+                // change regular timer to hide
+                player1Clock.classList.add('hide-timer')
 
-        document.querySelector('#game-grid')!.innerHTML = ``
+                // change innertext to reactiontime on answerclock
+                player1AnswerClock.classList.remove('hide-timer')
+                player1AnswerClock.innerText = `${reactionTime}`
+
+            } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
+                // change regular timer to hide
+                player2Clock.classList.add('hide-timer')
+
+                // change innertext to reactiontime on answerclock
+                player2AnswerClock.classList.remove('hide-timer')
+                player2AnswerClock.innerText = `${reactionTime}`
+            } else if (!userAnswered.success) {
+                // If both answered, pause timer
+                pauseTimer()
+            }
+        })
+    })
+})
+
+/**
+ * LOBBY SECTION
+ * @param user 
+ */
+document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
+    // ** Hide start-view and display lobby **
+    document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
+
+    socket.emit('goToLobby', (result) => {
+        console.log(result)
+        resetTimer()
     })
 })
 
@@ -127,12 +186,6 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     document.querySelector('.search-lobby-container')!.classList.remove('hide')
 })
 
-// ** Hide start-view and display lobby **
-document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
-    document.querySelector('.lobby-container')!.classList.remove('hide')
-    document.querySelector('.start-container')!.classList.add('hide')
-})
-
 // ** If 'tillbaka till start' pressed, hide lobby and show start-view ** 
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
@@ -141,8 +194,7 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
-let player1Clock = document.querySelector('#player-1-clock')
-let player2Clock = document.querySelector('#player-2-clock')
+
 let int: any = null
 
 const startTimer = () => {
@@ -152,6 +204,7 @@ const startTimer = () => {
     int = setInterval(displayTimer, 100)
 }
 
+// When timer is paused, replace the li elements with new ones so that timer doesnt updates
 const pauseTimer = () => {
     clearInterval(int)
 }
@@ -160,8 +213,6 @@ const resetTimer = () => {
     // Clear timer
     clearInterval(int);
     [tenth, seconds, minutes] = [0, 0, 0]
-    player1Clock!.innerHTML = '00 : 00 : 00'
-    player2Clock!.innerHTML = '00 : 00 : 00'
 }
 
 const displayTimer = () => {
@@ -175,10 +226,14 @@ const displayTimer = () => {
         }
     }
 
-    let m: string | number = minutes < 10 ? '0' + minutes : minutes
-    let s: string | number = seconds < 10 ? '0' + seconds : seconds
-    let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth
-    player1Clock!.innerHTML = ` ${m} : ${s} : ${t}`
-    player2Clock!.innerHTML = ` ${m} : ${s} : ${t}`
+    let m: string | number = minutes < 10 ? '0' + minutes : minutes;
+    let s: string | number = seconds < 10 ? '0' + seconds : seconds;
+    let t: string | number = tenth < 10 ? '0' + tenth : tenth < 100 ? + tenth : tenth;
+
+    if (player1Clock) player1Clock.innerHTML = ` ${m} : ${s} : ${t}`;
+    if (player2Clock) player2Clock.innerHTML = ` ${m} : ${s} : ${t}`;
 }
+
+
+
 
