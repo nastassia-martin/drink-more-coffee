@@ -128,7 +128,7 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.add('hide')
 
     socket.emit('goToLobby', (result) => {
-
+        console.log(result)
         resetTimer()
     })
 })

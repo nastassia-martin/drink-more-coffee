@@ -131,7 +131,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
     socket.on('goToLobby', async (callback) => {
         // Get rooms and their users 
-        await getRooms()
+        const rooms = await getRooms()
+        debug(rooms)
+
+        /* if (rooms) {
+            callback({
+                success: true,
+                data: {
+
+                }
+            })
+        } */
     })
 }
 

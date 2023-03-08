@@ -37,6 +37,11 @@ export interface GetGameroomResult {
     data: GameRoom | null
 }
 
+export interface GetGameroomResultLobby {
+    success: boolean,
+    data: GameRoom[] | null
+}
+
 export interface GetUserResult {
     success: boolean,
     data: User | null
