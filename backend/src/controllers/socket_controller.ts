@@ -4,7 +4,7 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
-import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
+import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
 import { check } from 'express-validator'
@@ -86,7 +86,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             await updateReactionTime(socket.id, reactionTimeTotal)
             await updateRounds(gameroomId, rounds)
             const room = await getRoom(gameroomId)
-
             const usersAnswered = room?.users.filter(user => user.reactionTime)
 
             if (usersAnswered?.length === 2) {
@@ -117,6 +116,19 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     data: null
                 })
             } else if (usersAnswered?.length === 1) {
+                let user = usersAnswered?.find(user => user.nickname)
+                debug('user:', user)
+
+                if (user) {
+                    if (user.score === null) {
+                        user.score = 0
+                    }
+
+                    ++user.score
+
+                    await updateScore(user.id, user.score)
+                }
+
                 // callback with user answered to stop their timer? 
                 callback({
                     success: true,
@@ -124,7 +136,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                         id: usersAnswered[0].id,
                         nickname: usersAnswered[0].nickname,
                         reactionTime: usersAnswered[0].reactionTime,
-                        gameroomId: usersAnswered[0].gameroomId
+                        gameroomId: usersAnswered[0].gameroomId,
+                        score: usersAnswered[0].score
                     }
                 })
             }
@@ -170,5 +183,4 @@ const calculateReactionTime = (time: string) => {
 const randomiseDelay = () => {
     return Math.floor(Math.random() * 6) + 1
 }
-
 

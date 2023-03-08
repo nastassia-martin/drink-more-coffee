@@ -41,7 +41,8 @@ export const createUser = async (user: User) => {
     return await prisma.user.create({
         data: {
             id: user.id,
-            nickname: user.nickname
+            nickname: user.nickname,
+            score: 0
         }
     })
 }
@@ -76,3 +77,13 @@ export const updateReactionTime = async (userId: string, reactionTime: number) =
 /**
  * 
  */
+export const updateScore = async (userId: string, score: number) => {
+    return await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            score
+        }
+    })
+}

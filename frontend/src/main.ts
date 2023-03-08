@@ -19,6 +19,11 @@ let player2Clock = document.querySelector('#player-2-clock') as HTMLElement
 let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTMLElement
 let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
 
+// Get elements for scores
+let player1score = document.querySelector('#player-1-score') as HTMLElement
+let player2score = document.querySelector('#player-2-score') as HTMLElement
+
+
 // Listen for connection
 socket.on('connect', () => {
     console.log('Connected to the server', socket.id)
@@ -98,6 +103,7 @@ socket.on('showCup', (width, height) => {
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')
+                player1score.innerText === `${userAnswered.data?.score}`
 
                 // change innertext to reactiontime on answerclock
                 player1AnswerClock.classList.remove('hide-timer')
@@ -106,7 +112,7 @@ socket.on('showCup', (width, height) => {
             } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player2Clock.classList.add('hide-timer')
-
+                player2score.innerText === `${userAnswered.data?.score}`
                 // change innertext to reactiontime on answerclock
                 player2AnswerClock.classList.remove('hide-timer')
                 player2AnswerClock.innerText = `${reactionTime}`
@@ -202,7 +208,8 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     const user: User = {
         id: socket.id,
         nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value.trim(),
-        reactionTime: null
+        reactionTime: null,
+        score: 0
     }
 
     // If nothing was entered/created, tell user and return
