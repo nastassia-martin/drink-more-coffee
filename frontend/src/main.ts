@@ -70,12 +70,20 @@ const showRounds = () => {
 }
 
 // Listen for when cup should show
-socket.on('showCup', (width, height) => {
+socket.on('showCup', (width, height, userArr) => {
     // Remove the answered time and set elements back
     player1AnswerClock.classList.add('hide-timer')
     player1Clock.classList.remove('hide-timer')
     player2AnswerClock.classList.add('hide-timer')
     player2Clock.classList.remove('hide-timer')
+    console.log(userArr)
+    if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
+        player1score.innerHTML = `${userArr[0].score}`
+    } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
+    player2score.innerHTML = `${userArr[1].score}`
+
+
+
 
     resetTimer()
     // Show coffee cup on randomised position and start timer
@@ -103,7 +111,7 @@ socket.on('showCup', (width, height) => {
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')
-                player1score.innerText === `${userAnswered.data?.score}`
+                // player1score.innerHTML = `${userAnswered.data?.score}`
 
                 // change innertext to reactiontime on answerclock
                 player1AnswerClock.classList.remove('hide-timer')
@@ -112,7 +120,7 @@ socket.on('showCup', (width, height) => {
             } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player2Clock.classList.add('hide-timer')
-                player2score.innerText === `${userAnswered.data?.score}`
+                // player2score.innerHTML = `${userAnswered.data?.score}`
                 // change innertext to reactiontime on answerclock
                 player2AnswerClock.classList.remove('hide-timer')
                 player2AnswerClock.innerText = `${reactionTime}`

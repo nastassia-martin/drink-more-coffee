@@ -1,5 +1,5 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number) => void
+    showCup: (width: number, height: number, usersArr: User[]) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void

@@ -58,7 +58,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     }
                 })
             }
-
+            let userArr = room?.users.filter(user => user.nickname)
+            debug(userArr)
             // Randomise position
             let width = Math.floor(Math.random() * x)
             let height = Math.floor(Math.random() * y)
@@ -67,7 +68,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const delay = randomiseDelay()
 
             setTimeout(() => {
-                io.in(gameroomId).emit('showCup', width, height)
+                io.in(gameroomId).emit('showCup', width, height, userArr!)
             }, delay * 1000)
         }
     })
@@ -91,7 +92,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
-
+                debug(usersArr)
                 // Randomise position
                 let width = Math.floor(Math.random() * x)
                 let height = Math.floor(Math.random() * y)
@@ -100,7 +101,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 const delay = randomiseDelay()
 
                 setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height,)
+                    io.in(gameroomId).emit('showCup', width, height, usersArr)
                 }, delay * 1000)
 
                 // Unset reactiontime in DB
@@ -115,17 +116,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             } else if (usersAnswered?.length === 1) {
                 let user = usersAnswered?.find(user => user.nickname)
-                debug('user:', user)
+                // debug('user:', user)
 
                 if (user) {
                     if (user.score === null) {
                         user.score = 0
                     }
 
-                    let score = ++user.score
+                    ++user.score
 
                     const updated = await updateScore(user.id, user.score)
-                    debug('updated', updated, 'score:', user.score)
+                    // debug('updated', updated, 'score:', user.score)
                 }
 
                 // callback with user answered to stop their timer? 
@@ -146,7 +147,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     socket.on('goToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
-        debug(rooms)
+        // debug(rooms)
 
         /* if (rooms) {
             callback({
