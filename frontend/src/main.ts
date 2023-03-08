@@ -109,7 +109,8 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     const user: User = {
         id: socket.id,
         nickname: (document.querySelector('#nickname-input') as HTMLInputElement).value.trim(),
-        reactionTime: null
+        reactionTime: null,
+        score: null
     }
 
     // If nothing was entered/created, tell user and return

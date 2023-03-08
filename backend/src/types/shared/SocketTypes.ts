@@ -20,6 +20,7 @@ export type User = {
     nickname: string
     reactionTime: number | null
     gameroomId?: string | null
+    score: number | null
 }
 
 export type GameRoom = {

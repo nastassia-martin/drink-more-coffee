@@ -93,16 +93,21 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
 
-                const player1 = usersAnswered?.[0].reactionTime
+                const player1 = { ...usersAnswered?.[0] }
                 debug('player 1', player1)
-                const player2 = usersAnswered?.[1].reactionTime
+                const player2 = { ...usersAnswered?.[1] }
                 debug('player2', player2)
 
-                if (player1! < player2!) {
+                if (player1.reactionTime! < player2.reactionTime!) {
                     debug('winner is player 1')
-                    // score++ for player 1
+                    player1.score!++
+                    //player1.score = 1
+                    debug('player 1 score', player1.score)
                 } else {
                     debug('winner is player 2')
+                    player2.score!++
+                    debug('player 2 score', player2.score)
+                    debug('player2', player2)
                     // score++ for player2
                 }
 
