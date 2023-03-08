@@ -86,28 +86,43 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             await updateReactionTime(socket.id, reactionTimeTotal)
 
             const room = await getRoom(gameroomId)
-            const usersInRoom = room?.users.filter(user => user.reactionTime)
+            const usersAnswered = room?.users.filter(user => user.reactionTime)
+            // debug('usersAnswered', usersAnswered)
 
-            if (usersInRoom?.length === 2) {
-                let usersArr = usersInRoom?.map(user => user.reactionTime)
-                debug('users has answered', usersArr)
 
-                // If two players answered, emit showCup event
-                if (usersArr.length === 2) {
-                    // Randomise position
-                    let width = Math.floor(Math.random() * x)
-                    let height = Math.floor(Math.random() * y)
+            if (usersAnswered?.length === 2) {
+                let usersArr = usersAnswered?.filter(user => user.reactionTime)
 
-                    // Randomise delay 
-                    const delay = randomiseDelay()
+                const player1 = usersAnswered?.[0].reactionTime
+                debug('player 1', player1)
+                const player2 = usersAnswered?.[1].reactionTime
+                debug('player2', player2)
 
-                    setTimeout(() => {
-                        io.in(gameroomId).emit('showCup', width, height)
-                    }, delay * 1000)
-
-                    // Unset reactiontime in DB
-                    await updateReactionTime(socket.id, 0)
+                if (player1! < player2!) {
+                    debug('winner is player 1')
+                    // score++ for player 1
+                } else {
+                    debug('winner is player 2')
+                    // score++ for player2
                 }
+
+                // debug('both users has answered', usersArr)
+
+                // Randomise position
+                let width = Math.floor(Math.random() * x)
+                let height = Math.floor(Math.random() * y)
+
+                // Randomise delay 
+                const delay = randomiseDelay()
+
+                setTimeout(() => {
+                    io.in(gameroomId).emit('showCup', width, height)
+                }, delay * 1000)
+
+                // Unset reactiontime in DB
+                usersArr.forEach(async (user) => {
+                    await updateReactionTime(user.id, 0)
+                })
             }
         }
     })
@@ -139,5 +154,4 @@ const calculateReactionTime = (time: string) => {
 const randomiseDelay = () => {
     return Math.floor(Math.random() * 6) + 1
 }
-
 

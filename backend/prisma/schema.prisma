@@ -14,8 +14,11 @@ model User {
   id           String    @id @map("_id")
   nickname     String
   reactionTime Int?
+  score        Int?
   gameroomId   String?   @db.ObjectId
   gameroom     Gameroom? @relation(fields: [gameroomId], references: [id])
+  Results      Result?   @relation(fields: [resultId], references: [id])
+  resultId     String?   @db.ObjectId
 }
 
 model Gameroom {
@@ -23,4 +26,9 @@ model Gameroom {
   name          String
   userConnected Boolean @default(false)
   users         User[]
+}
+
+model Result {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  users User[]
 }

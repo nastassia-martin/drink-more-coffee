@@ -50,6 +50,7 @@ socket.on('playerReady', () => {
 
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
+    resetTimer()
     // Show coffee cup on randomised position and start timer
     document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
     let coffee = document.querySelector('.coffee') as HTMLImageElement
@@ -59,17 +60,17 @@ socket.on('showCup', (width, height) => {
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-        y = gameGrid.offsetHeight
-        x = gameGrid.offsetWidth
-
         // Get the reaction time from each player
         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
+
+        pauseTimer()
+        y = gameGrid.offsetHeight
+        x = gameGrid.offsetWidth
 
         // Emit that the cup is clicked
         socket.emit('cupClicked', x, y, reactionTime)
 
         document.querySelector('#game-grid')!.innerHTML = ``
-        resetTimer()
     })
 })
 
@@ -150,6 +151,10 @@ const startTimer = () => {
     int = setInterval(displayTimer, 100)
 }
 
+const pauseTimer = () => {
+    clearInterval(int)
+}
+
 const resetTimer = () => {
     // Clear timer
     clearInterval(int);
@@ -175,5 +180,4 @@ const displayTimer = () => {
     player1Clock!.innerHTML = ` ${m} : ${s} : ${t}`
     player2Clock!.innerHTML = ` ${m} : ${s} : ${t}`
 }
-
 
