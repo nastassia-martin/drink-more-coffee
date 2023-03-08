@@ -83,6 +83,8 @@ $ff-header: 'Annie Use Your Telescope', cursive;
 
 @media screen and (max-width: 600px) {
     .start-container {
+        background-position: center;
+
         .nickname-container {
             width: 100%;
         }
