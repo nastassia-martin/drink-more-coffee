@@ -37,6 +37,7 @@ export const createRoom = async (room: GameRoom, user: User) => {
         data: {
             name: room.name,
             userConnected: true,
+            rounds: room.rounds,
             users: {
                 connectOrCreate: {
                     where: { id: user.id },

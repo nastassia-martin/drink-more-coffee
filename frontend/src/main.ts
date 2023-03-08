@@ -11,6 +11,14 @@ const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
 let y = gameGrid.offsetHeight
 let x = gameGrid.offsetWidth
 
+// Get the elements for stopwatches
+const player1NameEl = document.querySelector('#player-1-name')
+const player2NameEl = document.querySelector('#player-2-name')
+let player1Clock = document.querySelector('#player-1-clock') as HTMLElement
+let player2Clock = document.querySelector('#player-2-clock') as HTMLElement
+let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTMLElement
+let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
+
 // Listen for connection
 socket.on('connect', () => {
     console.log('Connected to the server', socket.id)
@@ -45,16 +53,7 @@ socket.on('playerReady', () => {
             document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
         }
     })
-    console.log('startgame emitted')
 })
-
-const player1NameEl = document.querySelector('#player-1-name')
-const player2NameEl = document.querySelector('#player-2-name')
-let player1Clock = document.querySelector('#player-1-clock') as HTMLElement
-let player2Clock = document.querySelector('#player-2-clock') as HTMLElement
-let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTMLElement
-let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
-
 
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
@@ -108,6 +107,20 @@ socket.on('showCup', (width, height) => {
     })
 })
 
+/**
+ * LOBBY SECTION
+ * @param user 
+ */
+document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
+    // ** Hide start-view and display lobby **
+    document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
+
+    socket.emit('goToLobby', (result) => {
+
+    })
+})
+
 // ** Display waiting page **
 const displayPlayerWaiting = (user: User) => {
     document.querySelector('.waiting-page')!.innerHTML =
@@ -158,12 +171,6 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
     // When "gå vidare" button clicked, go to lobby
     document.querySelector('.start-container')!.classList.add('hide')
     document.querySelector('.search-lobby-container')!.classList.remove('hide')
-})
-
-// ** Hide start-view and display lobby **
-document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
-    document.querySelector('.lobby-container')!.classList.remove('hide')
-    document.querySelector('.start-container')!.classList.add('hide')
 })
 
 // ** If 'tillbaka till start' pressed, hide lobby and show start-view ** 

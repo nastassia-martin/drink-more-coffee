@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { getRoom } from '../service/gameroom_service'
+import { getRoom, getRooms } from '../service/gameroom_service'
 import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -127,6 +127,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             }
         }
+    })
+
+    socket.on('goToLobby', async (callback) => {
+        // Get rooms and their users 
+        await getRooms()
     })
 }
 

@@ -14,6 +14,7 @@ export interface ClientToServerEvents {
         reactionTime: string,
         callback: (result: GetUserResult) => void
     ) => void
+    goToLobby: (callback: (result: GetGameroomResult) => void) => void
 }
 
 export type User = {
