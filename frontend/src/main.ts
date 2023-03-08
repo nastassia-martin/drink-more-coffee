@@ -55,6 +55,15 @@ socket.on('playerReady', () => {
     })
 })
 
+let rounds = 1
+let roundsTotal = 10
+const roundsDisplay = document.querySelector(".rounds-div")
+
+// Show current round
+const showRounds = () => {
+    roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
+}
+
 // Listen for when cup should show
 socket.on('showCup', (width, height) => {
     // Remove the answered time and set elements back
@@ -72,6 +81,7 @@ socket.on('showCup', (width, height) => {
 
     // Start timer for both players
     startTimer()
+    showRounds()
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
@@ -81,9 +91,10 @@ socket.on('showCup', (width, height) => {
         document.querySelector('#game-grid')!.innerHTML = ``
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
+        rounds++
 
         // Emit that the cup is clicked, get back result of who answered first
-        socket.emit('cupClicked', x, y, reactionTime, (userAnswered) => {
+        socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')
@@ -118,6 +129,7 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
 
     socket.emit('goToLobby', (result) => {
 
+        resetTimer()
     })
 })
 

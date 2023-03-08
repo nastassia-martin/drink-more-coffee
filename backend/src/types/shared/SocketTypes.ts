@@ -12,6 +12,7 @@ export interface ClientToServerEvents {
         positionX: number,
         positionY: number,
         reactionTime: string,
+        rounds: number,
         callback: (result: GetUserResult) => void
     ) => void
     goToLobby: (callback: (result: GetGameroomResult) => void) => void
@@ -28,6 +29,7 @@ export type GameRoom = {
     id?: string
     name: string
     users: User[] | null
+    rounds: number
 }
 
 export interface GetGameroomResult {
