@@ -4,12 +4,11 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
-import { createUser, getUser, disconnectUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
+import { createUser, getUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomiseDelay } from './room_controller'
-import { getRoom, updateRounds, getRooms, updateUserConnected, getOngoingGames } from '../service/gameroom_service'
+import { getRoom, updateRounds, updateUserConnected, getOngoingGames } from '../service/gameroom_service'
 import { createResult, getResults } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
-import { Result } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -44,7 +43,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     })
 
     socket.on('startGame', async (x, y, callback) => {
-        // Get the current gameroomId
+        // Get the current gameroom and send back to client in callback
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
 
@@ -62,6 +61,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             }
 
+            // Get users in room to send with showCup event
             let userArr = room?.users.filter(user => user.nickname)
 
             // Randomise position
@@ -71,6 +71,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Randomise delay 
             const delay = randomiseDelay()
 
+            // Tell client the game is ready to start
             setTimeout(() => {
                 io.in(gameroomId).emit('showCup', width, height, userArr!)
             }, delay * 1000)
@@ -82,13 +83,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
-
-        // Get rooms
         if (gameroomId) {
-            // Measure reactiontime
+            // Get reactiontime from client and calculate from 00 : 00 : 00 to 00.0
             const reactionTimeTotal = calculateReactionTime(reactionTime)
 
-            // Send reactionTime to database and update rounds
+            // Update user with rounds and reactiontime in DB 
             await updateReactionTime(socket.id, reactionTimeTotal)
             await updateRounds(gameroomId, rounds)
 
@@ -96,7 +95,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
 
-            // If both users answered, send new positions if rounds != 11 
+            // If both users answered, send new positions if rounds <= 10 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
 
@@ -107,17 +106,18 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds <= 5) {
+                if (rounds <= 10) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', width, height, usersArr)
                     }, delay * 1000)
                 } else {
-                    // Update userConnected to false
+                    // Update gameroom.userConnected to false
                     await updateUserConnected(gameroomId, false)
 
-                    // If game is over (10 rounds), send back who won to the client
+                    // If game is over (10 rounds), emit gameOver
                     io.in(gameroomId).emit('bothAnswered', true, usersArr)
                     io.in(gameroomId).emit('gameOver', usersArr)
+
                     // Recieves objects with results from the client
                     socket.on('sendResults', async (player1, player2, callback) => {
 
@@ -134,6 +134,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             await createResult(totalPlayer1, player1.users)
                             await createResult(totalPlayer2, player2.users)
 
+                            // If player1 won, send back information to the client
                             if (player1.users.score && player2.users.score) {
                                 if (player1.users.score > player2.users.score) {
                                     callback({
@@ -143,7 +144,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                                             users: player1.users
                                         }
                                     })
-                                    // callback i gameover för att berätta vem som vann
+                                    // If player2 won, send back information to the client
                                 } else if (player1.users.score < player2.users.score) {
                                     callback({
                                         success: true,
@@ -152,23 +153,26 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                                             users: player2.users
                                         }
                                     })
+                                    // If tie, send back message
                                 } else {
                                     callback({
                                         success: false,
                                         data: null,
-                                        message: 'Det blev oavgjort'
+                                        message: 'Oavgjort'
                                     })
                                 }
                             }
                         }
                     })
                 }
+
+                // ** If game rounds is less than 10  ** 
                 // Unset reactiontime in DB
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
                 })
 
-                // Send callback false, to let the client know it should pause timer
+                // Send callback with users who answered
                 callback({
                     success: true,
                     data: usersArr
@@ -181,6 +185,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 let user = usersAnswered?.find(user => user.nickname)
                 let userArr = usersAnswered.map(user => user)
 
+                // User who answered first is being given a point and updated in DB
                 if (user) {
                     if (user.score === null) {
                         user.score = 0
@@ -188,7 +193,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     ++user.score
                     await updateScore(user.id, user.score)
 
-                    // callback with user answered to stop their timer? 
+                    // Callback with the user who answered to update their timer
                     callback({
                         success: true,
                         data: userArr
@@ -197,6 +202,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             }
         }
 
+        // ** Emit lobby results each time a score is given ** 
         const ongoingRooms = await getOngoingGames(true)
         const finishedRooms = await getOngoingGames(false)
         const results = await getResults()
@@ -208,11 +214,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             results: results
         }
         socket.broadcast.emit('getInfoToLobby', result)
-
     })
 
     socket.on('getInfoToLobby', async (callback) => {
-        // Get rooms and their users 
+        // Send back information to the client about the current result
         const ongoingRooms = await getOngoingGames(true)
         const finishedRooms = await getOngoingGames(false)
         const results = await getResults()
@@ -223,7 +228,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             roomsFinished: finishedRooms,
             results: results
         })
-
     })
 
     socket.on('disconnect', async () => {
