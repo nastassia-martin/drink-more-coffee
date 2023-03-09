@@ -30,7 +30,6 @@ let roundsTotal = 10
 // Set empty arrays to push and calculate average reaction times
 let player1TimeArr: number[] = []
 let player2TimeArr: number[] = []
-let totalReactionTime: number = 0
 
 // Listen for connection
 socket.on('connect', () => {
@@ -186,7 +185,6 @@ const sendResultsToServer = (users: User[]) => {
     })
 }
 
-
 const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
     if (bothAnswered) {
         // uppdatera player 1 och 2
@@ -216,8 +214,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
     }
 }
 
-
-
 /**
  * Push reactiontime to array
  * @param reactionTime to push to array
@@ -241,18 +237,6 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
         updateLobby(result)
     })
 })
-
-// Till update lobby: 
-// lägg till boolean "ongoingGame" på gameRoom
-// när 10 rundor ha gått, uppdatera boolean till false
-// när ett gameroom startas, lägg till boolean false
-
-// till pågående matcher: 
-// ta bara ut de som har boolean true
-
-// till 10 senaste
-// ta bara ut de som har boolean false
-
 
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
