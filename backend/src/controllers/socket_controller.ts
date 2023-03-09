@@ -41,8 +41,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
     })
 
-
-    socket.on('disconnect', async (gameroomId) => {
+    socket.on('disconnect', async () => {
         const user = await getUser(socket.id)
         if (user && user?.gameroomId) {
             const room = await getRoom(user?.gameroomId)

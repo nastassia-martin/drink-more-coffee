@@ -55,6 +55,9 @@ socket.on('playerReady', () => {
 
     // Emit to server that the game is ready to start
     socket.emit('startGame', x, y, (gameroom) => {
+        document.querySelector('.playerLeft')!.classList.add('hide')
+        // document.querySelector('.goto-start')!.classList.add('hide')
+
         if (gameroom.data?.users) {
             // Display players name
             document.querySelector('#player-1-name')!.innerHTML = `${gameroom.data?.users[0].nickname}`
@@ -115,17 +118,26 @@ socket.on('showCup', (width, height, userArr) => {
     })
 })
 
+const hideAndShow = () => {
+    document.querySelector('.playerLeft')!.classList.remove('hide')
+    // document.querySelector('.goto-start')!.classList.remove('hide')
+    document.querySelector('#game-grid')!.classList.add('hide')
+    document.querySelector('#player-2-clock')!.classList.add('hide')
+    document.querySelector('#player-1-clock')!.classList.add('hide')
+}
+
 socket.on('userDisconnected', () => {
-    alert('user disconnected!')
-    setTimeout(() => {
+    hideAndShow()
+    document.querySelector('.playerLeft')!.innerHTML = `
+    <h2>Oh No!! <br> Din motspelare tröttnade på att spela...</h2>
+    <button class="goto-start">Gå tillbaka till start?</button>
+
+    `
+    document.querySelector('.goto-start')!.addEventListener('click', () => {
         document.querySelector('.game-room-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
-    }, 2000)
+    })
 })
-
-// socket.on('roomDisconnected' () => {
-
-// })
 
 socket.on('bothAnswered', (bothAnswered, usersArr) => {
     updateGameTimers(bothAnswered, usersArr)
@@ -144,7 +156,6 @@ socket.on('gameOver', (user) => {
 socket.on('getInfoToLobby', (result) => {
     updateLobby(result)
 })
-
 
 const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
     if (bothAnswered) {
@@ -191,7 +202,6 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     })
 })
 
-
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
     document.querySelector('.ongoing-games-column')!.innerHTML = `<h3>Pågående spel</h3>`
@@ -218,7 +228,6 @@ const updateLobby = (result: GetGameroomResultLobby) => {
         }
     })
 }
-
 
 const gameOver = document.querySelector('.gameover-container')
 
