@@ -87,3 +87,16 @@ export const updateScore = async (userId: string, score: number) => {
         }
     })
 }
+
+/**
+ * DELETE user from DB
+ * @param userId socket.id
+ * @returns deletes user from DB
+ */
+export const disconnectUser = async (userId: string) => {
+    await prisma.user.delete({
+        where: {
+            id: userId
+        }
+    })
+}

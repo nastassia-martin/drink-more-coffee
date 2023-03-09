@@ -4,7 +4,7 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
-import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime, updateScore } from '../service/user_service'
+import { createUser, getUser, disconnectUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
 import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
 import { check } from 'express-validator'
@@ -165,6 +165,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 data: rooms
             })
         }
+    })
+
+    socket.on('disconnect', async () => {
+        await disconnectUser(socket.id)
     })
 }
 

@@ -14,3 +14,15 @@ När alla 10 reactiontimes finns, dela totalen på tio för att få varje person
 När vi har ett average, skicka in i result databas som reactionTimeAvg med vilken user den tillhör
 
 
+
+
+// 1. 
+När users disconnectar, avsluta rum? 
+- Gör socket.on disconnect i socket_controller
+- Radera användaren & room
+- meddela användaren i frontend och skicka tillbaka till start
+
+// 2. 
+När result är skickat till databasen, radera user och gameroom (efter 10st sparade)
+
+// 3. 

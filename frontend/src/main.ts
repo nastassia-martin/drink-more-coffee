@@ -54,11 +54,10 @@ socket.on('playerReady', () => {
 
     // Emit to server that the game is ready to start
     socket.emit('startGame', x, y, (gameroom) => {
-        const users = gameroom.data?.users
-        if (users) {
+        if (gameroom.data?.users) {
             // Display players name
-            document.querySelector('#player-1-name')!.innerHTML = `${users[0].nickname}`
-            document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
+            document.querySelector('#player-1-name')!.innerHTML = `${gameroom.data?.users[0].nickname}`
+            document.querySelector('#player-2-name')!.innerHTML = `${gameroom.data?.users[1].nickname}`
         }
     })
 })
