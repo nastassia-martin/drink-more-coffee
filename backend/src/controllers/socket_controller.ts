@@ -9,8 +9,6 @@ import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomis
 import { getRoom, updateRounds, getRooms, getTenGames } from '../service/gameroom_service'
 import { createResult } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
-import { readSync } from 'fs'
-
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -122,18 +120,22 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                         // Gets the average reaction time of each player
                         const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
                         const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
+                        let averageArr1: number[] = []
+                        let averageArr2: number[] = []
+                        averageArr1.push(totalPlayer1)
+                        averageArr2.push(totalPlayer2)
 
                         // Create result in DB with both users
                         if (player1.users && player2.users) {
-                            const resultPlayer1 = await createResult(totalPlayer1, player1.users)
-                            const resultPlayer2 = await createResult(totalPlayer2, player2.users)
+                            await createResult(totalPlayer1, player1.users)
+                            await createResult(totalPlayer2, player2.users)
 
                             if (player1.users.score && player2.users.score) {
                                 if (player1.users.score > player2.users.score) {
                                     callback({
                                         success: true,
                                         data: {
-                                            reactionTimeAvg: resultPlayer1.reactionTimeAvg,
+                                            reactionTimeAvg: averageArr1,
                                             users: player1.users
                                         }
                                     })
@@ -144,7 +146,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                                     callback({
                                         success: true,
                                         data: {
-                                            reactionTimeAvg: resultPlayer2.reactionTimeAvg,
+                                            reactionTimeAvg: averageArr2,
                                             users: player2.users
                                         }
                                     })
@@ -159,7 +161,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             }
                         }
                     })
-
                 }
                 // Unset reactiontime in DB
                 usersArr.forEach(async (user) => {

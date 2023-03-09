@@ -38,7 +38,7 @@ export type GameRoom = {
 }
 
 export type Result = {
-    reactionTimeAvg: number[] | number
+    reactionTimeAvg: number[]
     users: User | null
 }
 

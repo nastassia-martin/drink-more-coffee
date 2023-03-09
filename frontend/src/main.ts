@@ -182,7 +182,7 @@ const sendResultsToServer = (users: User[]) => {
     }
     // Emit result objects to server
     socket.emit('sendResults', player1Result, player2Result, (result) => {
-        console.log('player 1 vann', result)
+        console.log('player vann', result)
     })
 }
 
@@ -194,7 +194,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
         const player2 = users.find(user => user.nickname === player2NameEl?.innerHTML)
 
         if (player1) {
-            console.log(player1, 'player1')
             player1Clock.classList.add('hide-timer')
             player1AnswerClock.classList.remove('hide-timer')
 
@@ -205,7 +204,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
             }
         }
         if (player2) {
-            console.log(player2, 'player2')
             player2Clock.classList.add('hide-timer')
             player2AnswerClock.classList.remove('hide-timer')
 
