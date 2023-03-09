@@ -143,10 +143,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                                             users: player1.users
                                         }
                                     })
-                                    debug('player 1 is the winner')
                                     // callback i gameover för att berätta vem som vann
                                 } else if (player1.users.score < player2.users.score) {
-                                    debug('player 2 is the winner')
                                     callback({
                                         success: true,
                                         data: {
@@ -155,7 +153,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                                         }
                                     })
                                 } else {
-                                    debug('det blev jämnt')
                                     callback({
                                         success: false,
                                         data: null,
