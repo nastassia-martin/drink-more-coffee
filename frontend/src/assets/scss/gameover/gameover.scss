@@ -52,13 +52,14 @@ $ff-h2: 'Reenie Beanie';
 
 @media screen and (max-width: 600px) {
     .gameover-container {
-        h2 {
-            padding-top: 8rem;
-        }
+        .content {
+            h2 {
+                padding-top: 7rem;
+            }
 
-        h4 {
-            padding-top: 0rem;
+            h4 {
+                padding-top: 1rem;
+            }
         }
     }
-
 }
