@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, GetRecentGamesLobby } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -10,6 +10,7 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
 let y = gameGrid.offsetHeight
 let x = gameGrid.offsetWidth
+console.log(x, y, gameGrid)
 
 // Get the elements for stopwatches
 const player1NameEl = document.querySelector('#player-1-name')
@@ -145,19 +146,44 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
 
     // Get result from DB to print out information in lobby
     socket.emit('getInfoToLobby', (result) => {
-        updateLobby(result)
+        // updateLobby(result, recent)
     })
+    // socket.emit('getRecentGames', (result) => {
+    //     updateLobby(result)
+    // })
 })
 
-socket.on('getInfoToLobby', (result) => {
-    updateLobby(result)
-    console.log('got result', result)
+socket.on('getInfoToLobby', (result, recent) => {
+    updateLobby(result, recent)
+    console.log('got result and recent10Games', result)
 })
+
+// socket.on('getRecentGames', (result) => {
+//     updateLobby(result)
+
+// })
 
 // ** Update lobby DOM **
-const updateLobby = (result: GetGameroomResultLobby) => {
+const updateLobby = (result: GetGameroomResultLobby, recent: GetRecentGamesLobby) => {
     document.querySelector('.ongoing-games-column')!.innerHTML = `<h3>Pågående spel</h3>`
-    document.querySelector('.highscore-column')!.innerHTML = `<h3>Highscores</h3>`
+    document.querySelector('.recent-games-column')!.innerHTML = `
+    <h3>10 senaste matcherna</h3>`
+    document.querySelector('.highscore-column')!.innerHTML = `
+    <h3>Highscore</h3>
+    <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
+
+    // 
+    recent.data?.forEach(room => {
+        if (room.users && room.users.length === 2) {
+            // Write out recent games
+            document.querySelector('.recent-games-column')!.innerHTML += `
+            <li class="recent-games-list">
+                <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
+                <span>${room.users[0].score} - ${room.users[1].score}</span>
+            </li>
+        `
+        }
+    })
 
     // Check that the scores updates in realtime
     result.data?.forEach(room => {
@@ -170,14 +196,15 @@ const updateLobby = (result: GetGameroomResultLobby) => {
                     </li>
                 `
 
-            // Write out highscores
+            // Write out top 10 highscores
             document.querySelector('.highscore-column')!.innerHTML += `
-                    <li class="highscore-list">
-                        <span>NAME 1 | NAME 2</span>
-                        <span>SCORE 1 - SCORE 2</span>
-                    </li>
-                `
+                <li class="highscore-list">
+                    <span>${room.users[0].nickname} | 0.5 sek </span>
+                </li>
+            `
         }
+
+
     })
 }
 

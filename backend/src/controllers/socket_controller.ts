@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, getUsersInGameroom, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
+import { getRoom, updateRounds, getRooms, getTenGames } from '../service/gameroom_service'
 import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -14,6 +14,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
     // Listen for user created
     socket.on('userJoin', async (user) => {
+
         // Create the incoming user in the database 
         await createUser(user)
 
@@ -139,18 +140,24 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 }
             }
         }
-
-        // Get rooms and their users 
+        // Get 10 latest finished games
+        const recentTenGames = await getTenGames()
         const rooms = await getRooms()
 
-        if (rooms) {
+        if (recentTenGames && rooms) {
+            const recent = {
+                success: true,
+                data: recentTenGames
+            }
             const result = {
                 success: true,
                 data: rooms
-            }
 
-            socket.broadcast.emit('getInfoToLobby', result)
+            }
+            socket.broadcast.emit('getInfoToLobby', result, recent)
+
         }
+
     })
 
     socket.on('getInfoToLobby', async (callback) => {

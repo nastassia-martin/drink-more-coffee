@@ -16,6 +16,17 @@ export const getRooms = async () => {
     })
 }
 
+export const getTenGames = async () => {
+    return await prisma.gameroom.findMany({
+        take: 10,
+        where: {
+            rounds: {
+                gt: 9
+            }
+        }
+    })
+}
+
 /**
  * Get a specific room
  */

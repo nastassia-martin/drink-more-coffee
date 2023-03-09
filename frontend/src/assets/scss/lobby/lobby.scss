@@ -100,8 +100,29 @@ $ff-h2: 'Reenie Beanie';
             .h3 {
                 font-size: 1.5rem;
                 padding: 1rem;
+                line-height: 5mm;
             }
 
+        }
+
+        .highscore-column {
+            overflow: scroll;
+
+            h2 {
+                font-size: 15px;
+                padding: 10px;
+            }
+
+            .highscore-list {
+                list-style: none;
+                display: flex;
+                justify-content: center;
+
+                span {
+                    padding: 10px 0;
+                    text-align: center;
+                }
+            }
         }
 
         .ongoing-games-column {
@@ -118,10 +139,10 @@ $ff-h2: 'Reenie Beanie';
             }
         }
 
-        .highscore-column {
+        .recent-games-column {
             overflow: scroll;
 
-            .highscore-list {
+            .recent-games-list {
                 list-style: none;
                 display: flex;
                 justify-content: space-between;
