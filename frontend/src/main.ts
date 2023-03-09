@@ -120,6 +120,20 @@ socket.on('bothAnswered', (bothAnswered, usersArr) => {
     updateGameTimers(bothAnswered, usersArr)
 })
 
+socket.on('gameOver', (user) => {
+    gameOver!.classList.remove('hide')
+    document.querySelector('.game-room-container')!.classList.add('hide')
+
+    gameOver!.innerHTML = `
+    <h2>AND THE WINNER IS......</h2>
+    <h3>${user.nickname}</h3>
+    `
+})
+
+socket.on('getInfoToLobby', (result) => {
+    updateLobby(result)
+})
+
 
 const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
     if (bothAnswered) {
@@ -166,9 +180,6 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     })
 })
 
-socket.on('getInfoToLobby', (result) => {
-    updateLobby(result)
-})
 
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
@@ -199,16 +210,6 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 
 const gameOver = document.querySelector('.gameover-container')
-
-socket.on('gameOver', (user) => {
-    gameOver!.classList.remove('hide')
-    document.querySelector('.game-room-container')!.classList.add('hide')
-
-    gameOver!.innerHTML = `
-    <h2>AND THE WINNER IS......</h2>
-    <h3>${user.nickname}</h3>
-    `
-})
 
 // ** Display waiting page **
 const displayPlayerWaiting = (user: User) => {
