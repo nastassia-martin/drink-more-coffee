@@ -1,5 +1,5 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number, usersArr: User[]) => void
+    showCup: (x: number, y: number, usersArr: User[]) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
@@ -7,10 +7,10 @@ export interface ServerToClientEvents {
 
 export interface ClientToServerEvents {
     userJoin: (user: User) => void
-    startGame: (positionX: number, positionY: number, callback: (result: GetGameroomResult) => void) => void
+    startGame: (callback: (result: GetGameroomResult) => void) => void
     cupClicked: (
-        positionX: number,
-        positionY: number,
+        // positionX: number,
+        // positionY: number,
         reactionTime: string,
         rounds: number,
         callback: (result: GetUserResult) => void

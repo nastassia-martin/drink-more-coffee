@@ -7,9 +7,9 @@ const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
 
 // Get the coordinates for the grid
-const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
-let y = gameGrid.offsetHeight
-let x = gameGrid.offsetWidth
+// const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
+// let y = gameGrid.offsetHeight
+// let x = gameGrid.offsetWidth
 
 // Get the elements for stopwatches
 const player1NameEl = document.querySelector('#player-1-name')
@@ -22,6 +22,8 @@ let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTM
 // Get elements for scores
 let player1score = document.querySelector('#player-1-score') as HTMLElement
 let player2score = document.querySelector('#player-2-score') as HTMLElement
+
+const coffeeGrid = document.querySelector('.coffee-grid') as HTMLDivElement
 
 
 // Listen for connection
@@ -45,12 +47,9 @@ socket.on('playerReady', () => {
     // Display ready page
     displayPlayerReady()
 
-    // Get the coordinates and send to the server, to randomise position
-    y = gameGrid.offsetHeight
-    x = gameGrid.offsetWidth
 
     // Emit to server that the game is ready to start
-    socket.emit('startGame', x, y, (gameroom) => {
+    socket.emit('startGame', (gameroom) => {
         const users = gameroom.data?.users
         if (users) {
             // Display players name
@@ -69,9 +68,20 @@ const showRounds = () => {
     roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
 }
 
+// 1. takout out x & y in html 
+//2. query selector <div class="grid-x-5 grid-y-3">
+//3. class list replace with value from back end
 // Listen for when cup should show
-socket.on('showCup', (width, height, userArr) => {
+
+socket.on('showCup', (x, y, userArr) => {
+
+    const gridX = x
+    const gridY = y
+    console.log(gridX, gridY)
+    // const y = document.querySelector('.grid-y-`${y}`') as HTMLDivElement
     // Remove the answered time and set elements back
+    // coffeeGrid.classList.replace('grid-x-5', `grid-x-${gridX}`)
+    // coffeeGrid.classList.replace('grid-y-5', `grid-x-${gridY}`)
     player1AnswerClock.classList.add('hide-timer')
     player1Clock.classList.remove('hide-timer')
     player2AnswerClock.classList.add('hide-timer')
@@ -82,15 +92,18 @@ socket.on('showCup', (width, height, userArr) => {
     } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
     player2score.innerHTML = `${userArr[1].score}`
 
-
-
-
     resetTimer()
     // Show coffee cup on randomised position and start timer
-    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-    let coffee = document.querySelector('.coffee') as HTMLImageElement
-    coffee.style.left = width + 'px'
-    coffee.style.top = height + 'px'
+    document.querySelector('#game-grid')!.innerHTML = `
+    <div class="coffee-grid grid-x-${gridX} grid-y-${gridY}">
+    <img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee img-fluid">
+    </div>`
+    // coffeeGrid.classList.replace('grid-x-5', `grid-x-${gridX}`)
+    // coffeeGrid.classList.replace('grid-y-5', `grid-x-${gridY}`)
+    coffeeGrid.innerHTML = `        
+        <img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee img-fluid">
+     `
+
 
     // Start timer for both players
     startTimer()
@@ -102,12 +115,14 @@ socket.on('showCup', (width, height, userArr) => {
         const reactionTime = document.querySelector('#player-1-clock')!.innerHTML
 
         document.querySelector('#game-grid')!.innerHTML = ``
-        y = gameGrid.offsetHeight
-        x = gameGrid.offsetWidth
+
+        //grid-x-5
+        // y = gameGrid.offsetHeight
+        // x = gameGrid.offsetWidth
         rounds++
 
         // Emit that the cup is clicked, get back result of who answered first
-        socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
+        socket.emit('cupClicked', reactionTime, rounds, (userAnswered) => {
             if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
                 // change regular timer to hide
                 player1Clock.classList.add('hide-timer')
