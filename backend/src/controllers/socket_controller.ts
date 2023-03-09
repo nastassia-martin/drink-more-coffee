@@ -40,7 +40,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
-    socket.on('startGame', async (x, y, callback) => {
+    socket.on('startGame', async (callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -58,22 +58,27 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     }
                 })
             }
-
+            let userArr = room?.users.filter(user => user.nickname)
+            // debug(userArr)
             // Randomise position
-            let width = Math.floor(Math.random() * x)
-            let height = Math.floor(Math.random() * y)
+
+            let x = Math.floor(Math.random() * 10) + 1
+            let y = Math.floor(Math.random() * 10) + 1
+
 
             // Randomise delay 
             const delay = randomiseDelay()
 
             setTimeout(() => {
-                io.in(gameroomId).emit('showCup', width, height)
-            }, delay * 1000)
+                delay * 1000
+                io.in(gameroomId).emit('showCup', x, y, userArr!)
+                debug("x,y in set timeout", x, y)
+            },)
         }
     })
 
     // Listen for cup clicked, recieve current time cup was clicked
-    socket.on('cupClicked', async (x, y, reactionTime, rounds, callback) => {
+    socket.on('cupClicked', async (reactionTime, rounds, callback) => {
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
@@ -91,16 +96,16 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             if (usersAnswered?.length === 2) {
                 let usersArr = usersAnswered?.filter(user => user.reactionTime)
-
+                // debug(usersArr)
                 // Randomise position
-                let width = Math.floor(Math.random() * x)
-                let height = Math.floor(Math.random() * y)
+                let x = Math.floor(Math.random() * 10) + 1
+                let y = Math.floor(Math.random() * 10) + 1
 
                 // Randomise delay 
                 const delay = randomiseDelay()
 
                 setTimeout(() => {
-                    io.in(gameroomId).emit('showCup', width, height,)
+                    io.in(gameroomId).emit('showCup', x, y, usersArr)
                 }, delay * 1000)
 
                 // Unset reactiontime in DB
@@ -115,13 +120,14 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 })
             } else if (usersAnswered?.length === 1) {
                 let user = usersAnswered?.find(user => user.nickname)
-                debug('user:', user)
+                // debug('user:', user)
 
                 if (user) {
                     if (user.score === null) {
                         user.score = 0
                     }
 
+                    ++user.score
                     ++user.score
 
                     await updateScore(user.id, user.score)
@@ -145,7 +151,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     socket.on('goToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
-        debug(rooms)
+        // debug(rooms)
 
         /* if (rooms) {
             callback({
