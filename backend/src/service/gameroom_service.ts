@@ -15,14 +15,16 @@ export const getRooms = async () => {
         }
     })
 }
-
-export const getTenGames = async () => {
+/**
+ * Get all rooms that has usersconnected true/false
+ * @returns 
+ */
+export const getOngoingGames = async (connected: boolean) => {
     return await prisma.gameroom.findMany({
-        take: 10,
         where: {
-            rounds: {
-                gt: 9
-            }
+            userConnected: connected
+        }, include: {
+            users: true
         }
     })
 }
@@ -70,6 +72,23 @@ export const updateRounds = async (gameroomId: string, rounds: number) => {
         },
         data: {
             rounds: rounds
+        }
+    })
+}
+
+/**
+ * Update when 10 rounds is done from usersconnected true to false
+ * @param gameroomId 
+ * @param connected 
+ * @returns 
+ */
+export const updateUserConnected = async (gameroomId: string, connected: boolean) => {
+    return await prisma.gameroom.update({
+        where: {
+            id: gameroomId
+        },
+        data: {
+            userConnected: false
         }
     })
 }

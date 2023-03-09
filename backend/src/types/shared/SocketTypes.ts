@@ -44,7 +44,7 @@ export type Result = {
 
 
 export interface ResultLobby {
-    reactionTimeAvg: number,
+    reactionTimeAvg: number[],
     users: User[] | null
 }
 
@@ -55,7 +55,8 @@ export interface GetGameroomResult {
 
 export interface GetGameroomResultLobby {
     success: boolean,
-    rooms: GameRoom[] | null
+    roomsOngoing: GameRoom[] | null
+    roomsFinished: GameRoom[] | null
     results: ResultLobby[] | null
 }
 

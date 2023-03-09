@@ -243,8 +243,15 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
 })
 
 // Till update lobby: 
-// result & rooms 
-// uppdatera getInfoToLobby med result & rooms
+// lägg till boolean "ongoingGame" på gameRoom
+// när 10 rundor ha gått, uppdatera boolean till false
+// när ett gameroom startas, lägg till boolean false
+
+// till pågående matcher: 
+// ta bara ut de som har boolean true
+
+// till 10 senaste
+// ta bara ut de som har boolean false
 
 
 // ** Update lobby DOM **
@@ -258,7 +265,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 
     // Write out ongoing games with nicknames and scores
-    result.rooms?.forEach(room => {
+    result.roomsOngoing?.forEach(room => {
         if (room.users && room.users.length === 2) {
             document.querySelector('.ongoing-games-column')!.innerHTML += `
                     <li class="ongoing-list">
@@ -281,19 +288,16 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     })
 
     // Write out 10 last games
-    result.results?.forEach(result => {
-        document.querySelector('.recent-games-column')!.innerHTML += `
+    result.roomsFinished?.forEach(room => {
+        if (room.users && room.users.length === 2) {
+            document.querySelector('.recent-games-column')!.innerHTML += `
         <li class="recent-games-list">
-
+            <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
+            <span>${room.users[0].score} - ${room.users[1].score}</span>
         </li>
         `
-        result.users?.forEach(user => {
-            document.querySelector('.recent-games-list')!.innerHTML += `
-                    <span>${user.nickname}: ${user.score}</span>
-            `
-        })
+        }
     })
-
     console.log(result)
 }
 

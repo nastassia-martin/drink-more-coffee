@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, disconnectUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomiseDelay } from './room_controller'
-import { getRoom, updateRounds, getRooms, getTenGames } from '../service/gameroom_service'
+import { getRoom, updateRounds, getRooms, updateUserConnected, getOngoingGames } from '../service/gameroom_service'
 import { createResult, getResults } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
 import { Result } from 'express-validator'
@@ -112,6 +112,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                         io.in(gameroomId).emit('showCup', width, height, usersArr)
                     }, delay * 1000)
                 } else {
+                    // Update userConnected to false
+                    await updateUserConnected(gameroomId, false)
+
                     // If game is over (10 rounds), send back who won to the client
                     io.in(gameroomId).emit('bothAnswered', true, usersArr)
                     io.in(gameroomId).emit('gameOver', usersArr)
@@ -197,31 +200,33 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             }
         }
 
-        const rooms = await getRooms()
+        const ongoingRooms = await getOngoingGames(true)
+        const finishedRooms = await getOngoingGames(false)
         const results = await getResults()
 
-        if (rooms) {
-            const result: GetGameroomResultLobby = {
-                success: true,
-                rooms: rooms,
-                results: results
-            }
-            socket.broadcast.emit('getInfoToLobby', result)
+        const result: GetGameroomResultLobby = {
+            success: true,
+            roomsOngoing: ongoingRooms,
+            roomsFinished: finishedRooms,
+            results: results
         }
+        socket.broadcast.emit('getInfoToLobby', result)
+
     })
 
     socket.on('getInfoToLobby', async (callback) => {
         // Get rooms and their users 
-        const rooms = await getRooms()
+        const ongoingRooms = await getOngoingGames(true)
+        const finishedRooms = await getOngoingGames(false)
         const results = await getResults()
 
-        if (rooms && results) {
-            callback({
-                success: true,
-                rooms: rooms,
-                results: results
-            })
-        }
+        callback({
+            success: true,
+            roomsOngoing: ongoingRooms,
+            roomsFinished: finishedRooms,
+            results: results
+        })
+
     })
 
     socket.on('disconnect', async () => {
