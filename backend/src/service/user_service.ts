@@ -94,9 +94,14 @@ export const updateScore = async (userId: string, score: number) => {
  * @returns deletes user from DB
  */
 export const disconnectUser = async (userId: string) => {
-    await prisma.user.delete({
+    await prisma.user.deleteMany({
         where: {
-            id: userId
+            id: userId,
+            gameroom: {
+                rounds: {
+                    lt: 10
+                }
+            }
         }
     })
 }

@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, disconnectUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus } from './room_controller'
-import { getRoom, updateRounds, getRooms } from '../service/gameroom_service'
+import { getRoom, updateRounds, getRooms, disconnectGameroom } from '../service/gameroom_service'
 import { check } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
@@ -38,6 +38,30 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Emit playerReady to the client
             io.in(availableRoomId).emit('playerReady', user)
         }
+
+    })
+
+
+    socket.on('disconnect', async (gameroomId) => {
+        const user = await getUser(socket.id)
+        if (user && user?.gameroomId) {
+            const room = await getRoom(user?.gameroomId)
+            await disconnectUser(socket.id)
+            debug('user disconnected from game', socket.id)
+
+            if (room) {
+                io.in(room?.id).emit('userDisconnected', user)
+            }
+
+            const room2 = await getRoom(user?.gameroomId)
+            if (room2?.users[0].id) {
+                await disconnectUser(room2?.users[0].id)
+
+                const deleteroom = await disconnectGameroom(room2?.id)
+                debug('room deleted:', deleteroom)
+            }
+        }
+
     })
 
     socket.on('startGame', async (x, y, callback) => {
@@ -167,9 +191,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
-    socket.on('disconnect', async () => {
-        await disconnectUser(socket.id)
-    })
+    // socket.on('disconnect', async () => {
+    //     await disconnectUser(socket.id)
+    //     debug('user disconnected from game')
+
+    //     io.in(availableRoomId).emit('userDisconnected', user)
+
+    // })
 }
 
 

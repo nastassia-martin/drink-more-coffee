@@ -35,6 +35,7 @@ socket.on('connect', () => {
 // Listen for disconnect
 socket.on('disconnect', () => {
     console.log('Disconnected from the server')
+
 })
 
 // Listen for if player waiting
@@ -113,6 +114,18 @@ socket.on('showCup', (width, height, userArr) => {
         })
     })
 })
+
+socket.on('userDisconnected', () => {
+    alert('user disconnected!')
+    setTimeout(() => {
+        document.querySelector('.game-room-container')!.classList.add('hide')
+        document.querySelector('.start-container')!.classList.remove('hide')
+    }, 2000)
+})
+
+// socket.on('roomDisconnected' () => {
+
+// })
 
 socket.on('bothAnswered', (bothAnswered, usersArr) => {
     updateGameTimers(bothAnswered, usersArr)

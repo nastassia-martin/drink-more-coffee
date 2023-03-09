@@ -4,6 +4,8 @@ export interface ServerToClientEvents {
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
     gameOver: (user: User) => void
+    userDisconnected: (user: User) => void
+    // roomDisconnected: (gameroomId: GameRoom) => void
     getInfoToLobby: (result: GetGameroomResultLobby) => void
     bothAnswered: (bothAnswred: boolean, user: User[]) => void
 }
