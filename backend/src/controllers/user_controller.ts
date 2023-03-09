@@ -2,7 +2,17 @@
  * User controller
  */
 
-// ** CREATE A USER ** 
-export const createUser = async () => {
-
+/**
+ * Sums the number in an array 
+ * @param playerArr to sum
+ * @returns value in 0.0 format
+ */
+export const calculateTotalReactionTime = (playerArr: number[]) => {
+    let totalReactionTime: number = 0
+    if (playerArr.length === 10) {
+        for (let i = 0; i < playerArr.length; i++) {
+            totalReactionTime += playerArr[i]
+        }
+    }
+    return Math.round((totalReactionTime / 10) * 10) / 10
 }

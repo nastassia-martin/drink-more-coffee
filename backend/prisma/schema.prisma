@@ -13,7 +13,7 @@ datasource db {
 model User {
   id           String    @id @map("_id")
   nickname     String
-  reactionTime Int?
+  reactionTime Float?
   score        Int?
   gameroomId   String?   @db.ObjectId
   gameroom     Gameroom? @relation(fields: [gameroomId], references: [id])
@@ -31,6 +31,6 @@ model Gameroom {
 
 model Result {
   id              String @id @default(auto()) @map("_id") @db.ObjectId
-  reactionTimeAvg Int
+  reactionTimeAvg Float
   users           User[]
 }

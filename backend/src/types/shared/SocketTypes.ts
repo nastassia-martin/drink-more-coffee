@@ -1,10 +1,11 @@
 export interface ServerToClientEvents {
-    showCup: (width: number, height: number) => void
+    showCup: (width: number, height: number, usersArr: User[]) => void
     playerWaiting: (user: User) => void
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
-    gameOver: (user: User) => void
+    gameOver: (users: User[]) => void
     getInfoToLobby: (result: GetGameroomResultLobby) => void
+    bothAnswered: (bothAnswred: boolean, user: User[]) => void
 }
 
 export interface ClientToServerEvents {
@@ -18,6 +19,7 @@ export interface ClientToServerEvents {
         callback: (result: GetUserResult) => void
     ) => void
     getInfoToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
+    sendResults: (player1: Result, player2: Result) => void
 }
 
 export type User = {
@@ -35,6 +37,11 @@ export type GameRoom = {
     rounds: number
 }
 
+export type Result = {
+    reactionTimeAvg: number[]
+    users: User | null
+}
+
 export interface GetGameroomResult {
     success: boolean,
     data: GameRoom | null
@@ -47,7 +54,7 @@ export interface GetGameroomResultLobby {
 
 export interface GetUserResult {
     success: boolean,
-    data: User | null
+    data: User[] | null
 }
 
 export interface GetRecentGamesLobby {

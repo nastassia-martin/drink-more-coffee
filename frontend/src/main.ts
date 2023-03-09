@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, GetRecentGamesLobby } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, GetRecentGamesLobby, Result } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -24,6 +24,14 @@ let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTM
 let player1score = document.querySelector('#player-1-score') as HTMLElement
 let player2score = document.querySelector('#player-2-score') as HTMLElement
 
+// Set values for rounds
+let rounds = 1
+let roundsTotal = 10
+
+// Set empty arrays to push and calculate average reaction times
+let player1TimeArr: number[] = []
+let player2TimeArr: number[] = []
+let totalReactionTime: number = 0
 
 // Listen for connection
 socket.on('connect', () => {
@@ -52,31 +60,26 @@ socket.on('playerReady', () => {
 
     // Emit to server that the game is ready to start
     socket.emit('startGame', x, y, (gameroom) => {
-        const users = gameroom.data?.users
-        if (users) {
+        if (gameroom.data?.users) {
             // Display players name
-            document.querySelector('#player-1-name')!.innerHTML = `${users[0].nickname}`
-            document.querySelector('#player-2-name')!.innerHTML = `${users[1].nickname}`
+            document.querySelector('#player-1-name')!.innerHTML = `${gameroom.data?.users[0].nickname}`
+            document.querySelector('#player-2-name')!.innerHTML = `${gameroom.data?.users[1].nickname}`
         }
     })
 })
 
-let rounds = 1
-let roundsTotal = 10
-const roundsDisplay = document.querySelector(".rounds-div")
-
-// Show current round
-const showRounds = () => {
-    roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
-}
-
 // Listen for when cup should show
-socket.on('showCup', (width, height) => {
+socket.on('showCup', (width, height, userArr) => {
     // Remove the answered time and set elements back
     player1AnswerClock.classList.add('hide-timer')
     player1Clock.classList.remove('hide-timer')
     player2AnswerClock.classList.add('hide-timer')
     player2Clock.classList.remove('hide-timer')
+
+    if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
+        player1score.innerHTML = `${userArr[0].score}`
+    } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
+    player2score.innerHTML = `${userArr[1].score}`
 
     resetTimer()
     // Show coffee cup on randomised position and start timer
@@ -87,7 +90,7 @@ socket.on('showCup', (width, height) => {
 
     // Start timer for both players
     startTimer()
-    showRounds()
+    document.querySelector(".rounds-div")!.textContent = `Runda: ${rounds} / ${roundsTotal}`
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
@@ -101,43 +104,133 @@ socket.on('showCup', (width, height) => {
 
         // Emit that the cup is clicked, get back result of who answered first
         socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
-            // if userAnswered = 1, skriv ut nedan
+            // Add reactiontime from DB to array, to later send in result
 
-            if (player1NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
-                // change regular timer to hide
-                player1Clock.classList.add('hide-timer')
-                player1score.innerText === `${userAnswered.data?.score}`
-
-                // change innertext to reactiontime on answerclock
-                player1AnswerClock.classList.remove('hide-timer')
-                player1AnswerClock.innerText = `${reactionTime}`
-            } else if (player2NameEl?.innerHTML === `${userAnswered.data?.nickname}`) {
-                // change regular timer to hide
-                player2Clock.classList.add('hide-timer')
-                player2score.innerText === `${userAnswered.data?.score}`
-
-                // change innertext to reactiontime on answerclock
-                player2AnswerClock.classList.remove('hide-timer')
-                player2AnswerClock.innerText = `${reactionTime}`
-            } else if (!userAnswered.success) {
-                // If both answered, pause timer
-
-                pauseTimer()
+            // if one user answered, stop their timer
+            if (userAnswered.data?.length === 1) {
+                if (player1NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
+                    player1Clock.classList.add('hide-timer')
+                    player1AnswerClock.classList.remove('hide-timer')
+                    player1AnswerClock.innerText = `${reactionTime}`
+                } else if (player2NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
+                    player2Clock.classList.add('hide-timer')
+                    player2AnswerClock.classList.remove('hide-timer')
+                    player2AnswerClock.innerText = `${reactionTime}`
+                }
             }
-
-            console.log('usersAnswered.data.users.length === 2')
-
-
-            // if userAnswered = 2, ta ut vem som svarade först och skriv ut dess tid
-
-
         })
     })
 })
 
+socket.on('bothAnswered', (bothAnswered, usersArr) => {
+    updateGameTimers(bothAnswered, usersArr)
+})
+
+socket.on('gameOver', (usersArr) => {
+    // Emit results objects to server
+    sendResultsToServer(usersArr)
+
+    gameOver!.classList.remove('hide')
+    document.querySelector('.game-room-container')!.classList.add('hide')
+
+    /* gameOver!.innerHTML = `
+    <h2>AND THE WINNER IS......</h2>
+    <h3>${user.nickname}</h3>
+    ` */
+})
+
+socket.on('getInfoToLobby', (result) => {
+    updateLobby(result)
+})
+
+// If 10 rounds is done, send array of player 1 and 2 to server 
+const sendResultsToServer = (users: User[]) => {
+    // uppdatera player 1 och 2
+    const player1 = users.find(user => user.nickname === player1NameEl?.innerHTML)
+    const player2 = users.find(user => user.nickname === player2NameEl?.innerHTML)
+
+    let player1Result: Result = {
+        reactionTimeAvg: player1TimeArr,
+        users: null
+    }
+
+    let player2Result: Result = {
+        reactionTimeAvg: player2TimeArr,
+        users: null
+    }
+
+    if (player1) {
+        player1Result = {
+            reactionTimeAvg: player1TimeArr,
+            users: {
+                id: player1.id,
+                nickname: player1.nickname,
+                reactionTime: player1.reactionTime,
+                score: player1.score
+            }
+        }
+    }
+    if (player2) {
+        player2Result = {
+            reactionTimeAvg: player2TimeArr,
+            users: {
+                id: player2.id,
+                nickname: player2.nickname,
+                reactionTime: player2.reactionTime,
+                score: player2.score
+            }
+        }
+    }
+    // Emit result objects to server
+    socket.emit('sendResults', player1Result, player2Result)
+}
+
+
+const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
+    if (bothAnswered) {
+        // uppdatera player 1 och 2
+        const player1 = users.find(user => user.nickname === player1NameEl?.innerHTML)
+        const player2 = users.find(user => user.nickname === player2NameEl?.innerHTML)
+
+        if (player1) {
+            console.log(player1, 'player1')
+            player1Clock.classList.add('hide-timer')
+            player1AnswerClock.classList.remove('hide-timer')
+
+            if (player1.reactionTime) {
+                const reactiontime = calculateReactionTime(player1.reactionTime)
+                player1AnswerClock.innerText = `${reactiontime}`
+                addReactionTime(player1.reactionTime, player1TimeArr)
+            }
+        }
+        if (player2) {
+            console.log(player2, 'player2')
+            player2Clock.classList.add('hide-timer')
+            player2AnswerClock.classList.remove('hide-timer')
+
+            if (player2.reactionTime) {
+                const reactiontime = calculateReactionTime(player2.reactionTime)
+                player2AnswerClock.innerText = `${reactiontime}`
+                addReactionTime(player2.reactionTime, player2TimeArr)
+            }
+        }
+    }
+}
+
+
+
+/**
+ * Push reactiontime to array
+ * @param reactionTime to push to array
+ * @param playerArr what array to push reactiontime to
+ */
+const addReactionTime = (reactionTime: number, playerArr: number[]) => {
+    playerArr.push(reactionTime)
+}
+
 /**
  * LOBBY SECTION
- * @param user 
+ * @param 
  */
 document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     // ** Hide start-view and display lobby **
@@ -146,44 +239,18 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
 
     // Get result from DB to print out information in lobby
     socket.emit('getInfoToLobby', (result) => {
-        // updateLobby(result, recent)
+        updateLobby(result)
     })
-    // socket.emit('getRecentGames', (result) => {
-    //     updateLobby(result)
-    // })
 })
-
-socket.on('getInfoToLobby', (result, recent) => {
-    updateLobby(result, recent)
-    console.log('got result and recent10Games', result)
-})
-
-// socket.on('getRecentGames', (result) => {
-//     updateLobby(result)
-
-// })
 
 // ** Update lobby DOM **
-const updateLobby = (result: GetGameroomResultLobby, recent: GetRecentGamesLobby) => {
+const updateLobby = (result: GetGameroomResultLobby) => {
     document.querySelector('.ongoing-games-column')!.innerHTML = `<h3>Pågående spel</h3>`
     document.querySelector('.recent-games-column')!.innerHTML = `
     <h3>10 senaste matcherna</h3>`
     document.querySelector('.highscore-column')!.innerHTML = `
     <h3>Highscore</h3>
     <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
-
-    // 
-    recent.data?.forEach(room => {
-        if (room.users && room.users.length === 2) {
-            // Write out recent games
-            document.querySelector('.recent-games-column')!.innerHTML += `
-            <li class="recent-games-list">
-                <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
-                <span>${room.users[0].score} - ${room.users[1].score}</span>
-            </li>
-        `
-        }
-    })
 
     // Check that the scores updates in realtime
     result.data?.forEach(room => {
@@ -210,16 +277,6 @@ const updateLobby = (result: GetGameroomResultLobby, recent: GetRecentGamesLobby
 
 
 const gameOver = document.querySelector('.gameover-container')
-
-socket.on('gameOver', (user) => {
-    gameOver!.classList.remove('hide')
-    document.querySelector('.game-room-container')!.classList.add('hide')
-
-    gameOver!.innerHTML = `
-    <h2>AND THE WINNER IS......</h2>
-    <h3>${user.nickname}</h3>
-    `
-})
 
 // ** Display waiting page **
 const displayPlayerWaiting = (user: User) => {
@@ -282,7 +339,6 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
-
 let int: any = null
 
 const startTimer = () => {
@@ -290,11 +346,6 @@ const startTimer = () => {
         clearInterval(int)
     }
     int = setInterval(displayTimer, 100)
-}
-
-// When timer is paused, replace the li elements with new ones so that timer doesnt updates
-const pauseTimer = () => {
-    clearInterval(int)
 }
 
 const resetTimer = () => {
@@ -322,6 +373,22 @@ const displayTimer = () => {
     if (player2Clock) player2Clock.innerHTML = ` ${m} : ${s} : ${t}`;
 }
 
+/**
+ * Convert time from 00.0 format to 00 : 00 : 00
+ * @param time in tenth of seconds 
+ */
+const calculateReactionTime = (time: number) => {
+    let m: string | number = Math.floor(time / 60)
+    let s: string | number = Math.floor(time - m)
 
+    let getDecmial = time.toString().indexOf(".")
+    let t: string | number = time.toString().substring(getDecmial + 1)
 
+    m = m < 10 ? '0' + m : m
+    s = s < 10 ? '0' + s : s
+    t = (Number(t) * 10).toString()
 
+    let total = `${m} : ${s} : ${t}`
+
+    return total
+}

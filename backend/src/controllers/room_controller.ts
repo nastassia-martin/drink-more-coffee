@@ -81,3 +81,31 @@ export const checkPlayerStatus = async () => {
         } else return playerWaiting = false
     }
 }
+
+/**
+ * Convert time from 00 : 00 : 00 format to 00.0
+ * @param time from stopwatch
+ */
+export const calculateReactionTime = (time: string) => {
+    // Get the values from 00 : 00 : 00 format
+    const min = time.slice(0, 3)
+    const sec = time.slice(5, 8)
+    const tenth = time.slice(10, 12)
+
+    // Add the values to total
+    let total: number = 0
+
+    if (min) total = 60 * Number(min)
+    if (sec) total = total + Number(sec)
+    if (tenth) total = total + (Number(tenth) / 10)
+
+    return total
+}
+
+/**
+ * Randomise a number to use as delay in setTimeouts
+ * @returns a random number between 1 - 5
+ */
+export const randomiseDelay = () => {
+    return Math.floor(Math.random() * 6) + 1
+}
