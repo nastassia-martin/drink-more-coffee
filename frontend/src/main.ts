@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, Result } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, Result, UserWonResult } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -182,6 +182,8 @@ const sendResultsToServer = (users: User[]) => {
     // Emit result objects to server
     socket.emit('sendResults', player1Result, player2Result, (result) => {
         console.log('player vann', result)
+
+        displayGameOverPage(result)
     })
 }
 
@@ -288,7 +290,8 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 const gameOver = document.querySelector('.gameover-container')
 
-socket.on('gameOver', (user) => {
+// ** Display game over page ** 
+const displayGameOverPage = (result: UserWonResult) => {
     gameOver!.classList.remove('hide')
     document.querySelector('.game-room-container')!.classList.add('hide')
 
@@ -303,7 +306,7 @@ socket.on('gameOver', (user) => {
                 <div class="back-fold"></div>
                 <div class="letter">
                     <div class="letter-title">
-                        <h3>HEJHEJ</h3>
+                        <h3>${result.data?.users?.nickname}</h3>
                     </div>
                 </div>
                 <div class="top-fold"></div>
@@ -320,7 +323,7 @@ socket.on('gameOver', (user) => {
         document.querySelector('.start-container')!.classList.remove('hide')
         console.log('click')
     })
-})
+}
 
 // ** Display waiting page **
 const displayPlayerWaiting = (user: User) => {
