@@ -155,8 +155,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
-
-
     socket.on('getInfoToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()

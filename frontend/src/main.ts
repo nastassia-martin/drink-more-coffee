@@ -73,9 +73,8 @@ socket.on('showCup', (width, height, userArr) => {
 
     if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
         player1score.innerHTML = `${userArr[0].score}`
-    } else if (player2NameEl?.innerHTML === `${userArr[1].nickname}`) {
-        player2score.innerHTML = `${userArr[1].score}`
-    }
+    } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
+    player2score.innerHTML = `${userArr[1].score}`
 
     resetTimer()
     // Show coffee cup on randomised position and start timer
