@@ -6,11 +6,6 @@ import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobb
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
 const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOST)
 
-// Get the coordinates for the grid
-const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
-let y = gameGrid.offsetHeight
-let x = gameGrid.offsetWidth
-
 // Get the elements for stopwatches
 const player1NameEl = document.querySelector('#player-1-name')
 const player2NameEl = document.querySelector('#player-2-name')
@@ -20,7 +15,7 @@ let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTM
 let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
 
 // Get element for coffee cup
-let coffee = document.querySelector('.coffee') as HTMLImageElement
+const coffeeGrid = document.querySelector('.coffee-grid') as HTMLDivElement
 
 // Set values for rounds
 let rounds = 1
@@ -51,12 +46,8 @@ socket.on('playerReady', () => {
     // Display ready page
     displayPlayerReady()
 
-    // Get the coordinates and send to the server, to randomise position
-    y = gameGrid.offsetHeight
-    x = gameGrid.offsetWidth
-
     // Emit to server that the game is ready to start
-    socket.emit('startGame', x, y, (gameroom) => {
+    socket.emit('startGame', (gameroom) => {
         if (gameroom.data?.users) {
             // Display players name
             document.querySelector('#player-1-name')!.innerHTML = `${gameroom.data?.users[0].nickname}`
@@ -66,12 +57,24 @@ socket.on('playerReady', () => {
 })
 
 // Listen for when cup should show
-socket.on('showCup', (width, height, userArr) => {
+socket.on('showCup', (x, y, userArr) => {
+    const gridX = x
+    const gridY = y
+
     // Remove the answered time and set elements back
     updateScoreAndTimer(userArr)
 
     // Show coffee cup on randomised position and start timer
-    displayCoffeeCup(width, height)
+    document.querySelector('#game-grid')!.innerHTML = `
+    <div class="coffee-grid grid-x-${gridX} grid-y-${gridY}">
+    <img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee img-fluid">
+    </div>`
+
+    coffeeGrid.innerHTML = `        
+        <img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee img-fluid">
+     `
+
+    // Start timer for both players
     startTimer()
 
     // Update rounds
@@ -85,11 +88,9 @@ socket.on('showCup', (width, height, userArr) => {
         const reactionTime = document.querySelector('.player-clock')!.innerHTML
 
         document.querySelector('#game-grid')!.innerHTML = ``
-        y = gameGrid.offsetHeight
-        x = gameGrid.offsetWidth
 
         // Emit that the cup is clicked, get back result of who answered first
-        socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
+        socket.emit('cupClicked', reactionTime, rounds, (userAnswered) => {
             // Update the stopwatches with reactiontimes 
             if (userAnswered.data?.length === 1) {
                 if (player1NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
@@ -149,16 +150,7 @@ const updateScoreAndTimer = (userArr: User[]) => {
 
     resetTimer()
 }
-/**
- * 
- * @param width & height of div
- * @param elem 
- */
-const displayCoffeeCup = (width: number, height: number) => {
-    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-    coffee.style.left = width + 'px'
-    coffee.style.top = height + 'px'
-}
+
 
 /**
  * Create objects with players results and emit to server
