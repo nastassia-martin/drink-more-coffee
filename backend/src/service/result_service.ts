@@ -1,5 +1,5 @@
 /**
- * User service
+ * Result service
  */
 
 import prisma from '../prisma'

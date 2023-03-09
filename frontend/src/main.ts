@@ -19,9 +19,8 @@ let player2Clock = document.querySelector('#player-2-clock') as HTMLElement
 let player1AnswerClock = document.querySelector('#player-1-answer-clock') as HTMLElement
 let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTMLElement
 
-// Get elements for scores
-let player1score = document.querySelector('#player-1-score') as HTMLElement
-let player2score = document.querySelector('#player-2-score') as HTMLElement
+// Get element for coffee cup
+let coffee = document.querySelector('.coffee') as HTMLImageElement
 
 // Set values for rounds
 let rounds = 1
@@ -69,42 +68,29 @@ socket.on('playerReady', () => {
 // Listen for when cup should show
 socket.on('showCup', (width, height, userArr) => {
     // Remove the answered time and set elements back
-    player1AnswerClock.classList.add('hide-timer')
-    player1Clock.classList.remove('hide-timer')
-    player2AnswerClock.classList.add('hide-timer')
-    player2Clock.classList.remove('hide-timer')
+    updateScoreAndTimer(userArr)
 
-    if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
-        player1score.innerHTML = `${userArr[0].score}`
-    } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
-    player2score.innerHTML = `${userArr[1].score}`
-
-    resetTimer()
     // Show coffee cup on randomised position and start timer
-    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
-    let coffee = document.querySelector('.coffee') as HTMLImageElement
-    coffee.style.left = width + 'px'
-    coffee.style.top = height + 'px'
-
-    // Start timer for both players
+    displayCoffeeCup(width, height)
     startTimer()
+
+    // Update rounds
     document.querySelector(".rounds-div")!.textContent = `Runda: ${rounds} / ${roundsTotal}`
 
-    // Listen for clicks on coffee cup
+    // When coffee cup clicked, emit to server
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-        // Get the reaction time from each player
+        rounds++ // Add rounds
+
+        // Get the reaction time from the stopwatch
         const reactionTime = document.querySelector('.player-clock')!.innerHTML
 
         document.querySelector('#game-grid')!.innerHTML = ``
         y = gameGrid.offsetHeight
         x = gameGrid.offsetWidth
-        rounds++
 
         // Emit that the cup is clicked, get back result of who answered first
         socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
-            // Add reactiontime from DB to array, to later send in result
-
-            // if one user answered, stop their timer
+            // Update the stopwatches with reactiontimes 
             if (userAnswered.data?.length === 1) {
                 if (player1NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
                     player1Clock.classList.add('hide-timer')
@@ -127,21 +113,57 @@ socket.on('bothAnswered', (bothAnswered, usersArr) => {
 socket.on('gameOver', (usersArr) => {
     // Emit results objects to server
     sendResultsToServer(usersArr)
-
-    gameOver!.classList.remove('hide')
-    document.querySelector('.game-room-container')!.classList.add('hide')
-
-    /* gameOver!.innerHTML = `
-    <h2>AND THE WINNER IS......</h2>
-    <h3>${user.nickname}</h3>
-    ` */
 })
 
 socket.on('getInfoToLobby', (result) => {
     updateLobby(result)
 })
 
-// If 10 rounds is done, send array of player 1 and 2 to server 
+// ** LOBBY SECTION ** 
+document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
+    // ** Hide start-view and display lobby **
+    document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
+
+    // Get result from DB to print out information in lobby
+    socket.emit('getInfoToLobby', (result) => {
+        updateLobby(result)
+    })
+})
+
+/**
+ * Displays updated timers with players reactiontimes and resets timer
+ * @param userArr what users to update
+ */
+const updateScoreAndTimer = (userArr: User[]) => {
+    // Remove the answered time and set elements back
+    player1AnswerClock.classList.add('hide-timer')
+    player1Clock.classList.remove('hide-timer')
+    player2AnswerClock.classList.add('hide-timer')
+    player2Clock.classList.remove('hide-timer')
+
+    if (player1NameEl?.innerHTML === `${userArr[0].nickname}`) {
+        document.querySelector('#player-1-score')!.innerHTML = `${userArr[0].score}`
+    } else (player2NameEl?.innerHTML === `${userArr[1].nickname}`)
+    document.querySelector('#player-2-score')!.innerHTML = `${userArr[1].score}`
+
+    resetTimer()
+}
+/**
+ * 
+ * @param width & height of div
+ * @param elem 
+ */
+const displayCoffeeCup = (width: number, height: number) => {
+    document.querySelector('#game-grid')!.innerHTML = `<img src="./src/assets/images/pngegg.png" alt="coffee-cup" id="coffee-virus" class="coffee">`
+    coffee.style.left = width + 'px'
+    coffee.style.top = height + 'px'
+}
+
+/**
+ * Create objects with players results and emit to server
+ * @param users array of users to send result of
+ */
 const sendResultsToServer = (users: User[]) => {
     // uppdatera player 1 och 2
     const player1 = users.find(user => user.nickname === player1NameEl?.innerHTML)
@@ -181,12 +203,15 @@ const sendResultsToServer = (users: User[]) => {
     }
     // Emit result objects to server
     socket.emit('sendResults', player1Result, player2Result, (result) => {
-        console.log('player vann', result)
-
         displayGameOverPage(result)
     })
 }
 
+/**
+ * Update the stopwatches and add reactiontimes to array
+ * @param bothAnswered if both has answered
+ * @param users what users are currently playing
+ */
 const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
     if (bothAnswered) {
         // uppdatera player 1 och 2
@@ -224,21 +249,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
 const addReactionTime = (reactionTime: number, playerArr: number[]) => {
     playerArr.push(reactionTime)
 }
-
-/**
- * LOBBY SECTION
- * @param 
- */
-document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
-    // ** Hide start-view and display lobby **
-    document.querySelector('.lobby-container')!.classList.remove('hide')
-    document.querySelector('.start-container')!.classList.add('hide')
-
-    // Get result from DB to print out information in lobby
-    socket.emit('getInfoToLobby', (result) => {
-        updateLobby(result)
-    })
-})
 
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
@@ -284,14 +294,12 @@ const updateLobby = (result: GetGameroomResultLobby) => {
         `
         }
     })
-    console.log(result)
 }
-
-
-const gameOver = document.querySelector('.gameover-container')
 
 // ** Display game over page ** 
 const displayGameOverPage = (result: UserWonResult) => {
+    const gameOver = document.querySelector('.gameover-container')
+
     gameOver!.classList.remove('hide')
     document.querySelector('.game-room-container')!.classList.add('hide')
 
@@ -321,7 +329,6 @@ const displayGameOverPage = (result: UserWonResult) => {
     document.querySelector('.play-again')?.addEventListener('click', () => {
         document.querySelector('.gameover-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
-        console.log('click')
     })
 }
 

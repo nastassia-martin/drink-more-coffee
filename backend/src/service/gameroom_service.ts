@@ -17,7 +17,6 @@ export const getRooms = async () => {
 }
 /**
  * Get all rooms that has usersconnected true/false
- * @returns 
  */
 export const getOngoingGames = async (connected: boolean) => {
     return await prisma.gameroom.findMany({
@@ -31,7 +30,7 @@ export const getOngoingGames = async (connected: boolean) => {
 }
 
 /**
- * Get a specific room
+ * Get a specific room by gameroomId
  */
 export const getRoom = async (gameroomId: string) => {
     return await prisma.gameroom.findUnique({
@@ -66,6 +65,9 @@ export const createRoom = async (room: GameRoom, user: User) => {
     })
 }
 
+/**
+ * Update rounds in a gameroom
+ */
 export const updateRounds = async (gameroomId: string, rounds: number) => {
     return await prisma.gameroom.update({
         where: {
@@ -79,11 +81,8 @@ export const updateRounds = async (gameroomId: string, rounds: number) => {
 
 /**
  * Update when 10 rounds is done from usersconnected true to false
- * @param gameroomId 
- * @param connected 
- * @returns 
  */
-export const updateUserConnected = async (gameroomId: string, connected: boolean) => {
+export const updateUserConnected = async (gameroomId: string) => {
     return await prisma.gameroom.update({
         where: {
             id: gameroomId

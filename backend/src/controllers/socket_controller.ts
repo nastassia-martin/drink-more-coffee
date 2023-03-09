@@ -112,7 +112,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     }, delay * 1000)
                 } else {
                     // Update gameroom.userConnected to false
-                    await updateUserConnected(gameroomId, false)
+                    await updateUserConnected(gameroomId)
 
                     // If game is over (10 rounds), emit gameOver
                     io.in(gameroomId).emit('bothAnswered', true, usersArr)
