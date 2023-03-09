@@ -92,3 +92,11 @@ export const updateUserConnected = async (gameroomId: string) => {
         }
     })
 }
+
+export const disconnectGameroom = async (gameroomId: string) => {
+    await prisma.gameroom.delete({
+        where: {
+            id: gameroomId
+        }
+    })
+}

@@ -33,6 +33,7 @@ socket.on('connect', () => {
 // Listen for disconnect
 socket.on('disconnect', () => {
     console.log('Disconnected from the server')
+
 })
 
 // Listen for if player waiting
@@ -48,6 +49,8 @@ socket.on('playerReady', () => {
 
     // Emit to server that the game is ready to start
     socket.emit('startGame', (gameroom) => {
+        document.querySelector('.playerLeft')!.classList.add('hide')
+
         if (gameroom.data?.users) {
             // Display players name
             document.querySelector('#player-1-name')!.innerHTML = `${gameroom.data?.users[0].nickname}`
@@ -104,6 +107,26 @@ socket.on('showCup', (x, y, userArr) => {
                 }
             }
         })
+    })
+})
+
+const hideAndShow = () => {
+    document.querySelector('.playerLeft')!.classList.remove('hide')
+    document.querySelector('#game-grid')!.classList.add('hide')
+    /*  document.querySelector('#player-2-clock')!.classList.add('hide')
+     document.querySelector('#player-1-clock')!.classList.add('hide') */
+}
+
+socket.on('userDisconnected', () => {
+    hideAndShow()
+    document.querySelector('.playerLeft')!.innerHTML = `
+    <h2>Oh No!! <br> Din motspelare tröttnade på att spela...</h2>
+    <button class="goto-start">Gå tillbaka till start?</button>
+
+    `
+    document.querySelector('.goto-start')!.addEventListener('click', () => {
+        document.querySelector('.game-room-container')!.classList.add('hide')
+        document.querySelector('.start-container')!.classList.remove('hide')
     })
 })
 
@@ -241,6 +264,18 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
 const addReactionTime = (reactionTime: number, playerArr: number[]) => {
     playerArr.push(reactionTime)
 }
+
+
+document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
+    // ** Hide start-view and display lobby **
+    document.querySelector('.lobby-container')!.classList.remove('hide')
+    document.querySelector('.start-container')!.classList.add('hide')
+
+    // Get result from DB to print out information in lobby
+    socket.emit('getInfoToLobby', (result) => {
+        updateLobby(result)
+    })
+})
 
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {

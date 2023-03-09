@@ -4,9 +4,9 @@ const debug = Debug('chat:socket_controller')
 import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
-import { createUser, getUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
+import { createUser, getUser, updateUser, updateReactionTime, updateScore, disconnectUser } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomiseDelay } from './room_controller'
-import { getRoom, updateRounds, updateUserConnected, getOngoingGames } from '../service/gameroom_service'
+import { getRoom, updateRounds, updateUserConnected, getOngoingGames, disconnectGameroom } from '../service/gameroom_service'
 import { createResult, getResults } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
 
@@ -40,6 +40,27 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Emit playerReady to the client
             io.in(availableRoomId).emit('playerReady', user)
         }
+
+    })
+
+    socket.on('disconnect', async () => {
+        const user = await getUser(socket.id)
+        if (user && user?.gameroomId) {
+            const room = await getRoom(user?.gameroomId)
+            await disconnectUser(socket.id)
+
+            if (room) {
+                io.in(room?.id).emit('userDisconnected', user)
+            }
+
+            const room2 = await getRoom(user?.gameroomId)
+            if (room2?.users[0].id) {
+                await disconnectUser(room2?.users[0].id)
+
+                const deleteroom = await disconnectGameroom(room2?.id)
+            }
+        }
+
     })
 
     socket.on('startGame', async (callback) => {
@@ -229,9 +250,5 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             roomsFinished: finishedRooms,
             results: results
         })
-    })
-
-    socket.on('disconnect', async () => {
-        //await disconnectUser(socket.id)
     })
 }
