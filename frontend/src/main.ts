@@ -10,7 +10,6 @@ const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_HOS
 const gameGrid = document.querySelector('#game-grid') as HTMLDivElement
 let y = gameGrid.offsetHeight
 let x = gameGrid.offsetWidth
-console.log(x, y, gameGrid)
 
 // Get the elements for stopwatches
 const player1NameEl = document.querySelector('#player-1-name')
@@ -183,6 +182,7 @@ const sendResultsToServer = (users: User[]) => {
     }
     // Emit result objects to server
     socket.emit('sendResults', player1Result, player2Result)
+    console.log('emitted', player1Result.reactionTimeAvg, player2Result.reactionTimeAvg)
 }
 
 

@@ -93,12 +93,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             await updateReactionTime(socket.id, reactionTimeTotal)
             await updateRounds(gameroomId, rounds)
 
-
-
-            // Add reactiontime to array
-            /* addReactionTime(reactionTimeTotal, playerTimeArr)
-            debug(playerTimeArr) */
-
             // Get the room and the users who answered
             const room = await getRoom(gameroomId)
             const usersAnswered = room?.users.filter(user => user.reactionTime)
@@ -114,21 +108,40 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds !== 11) {
+                if (rounds <= 3) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', width, height, usersArr)
                     }, delay * 1000)
                 } else {
                     // If game is over (10 rounds), send two results with each users times
-
+                    io.in(gameroomId).emit('bothAnswered', true, usersArr)
                     io.in(gameroomId).emit('gameOver', usersArr)
-                    socket.on('sendResults', (player1, player2) => {
+
+                    // Recieves objects with results from the client
+                    socket.on('sendResults', async (player1, player2) => {
                         debug('player1:', player1, 'player2:', player2)
 
+                        // Gets the average reaction time of each player
                         const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
                         const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
 
+                        debug(totalPlayer1, totalPlayer2)
 
+                        // Create result in DB
+                        if (player1.users && player2.users) {
+                            const player1res = await createResult(totalPlayer1, player1.users)
+                            const player2res = await createResult(totalPlayer2, player2.users)
+                            debug(player1res, 'player1res')
+
+                            if (player1.users.score && player2.users.score) {
+                                if (player1.users.score > player2.users.score) {
+                                    debug('player 1 is the winner')
+                                } else {
+                                    debug('player 2 is the winner')
+                                }
+
+                            }
+                        }
                     })
                 }
                 // Unset reactiontime in DB

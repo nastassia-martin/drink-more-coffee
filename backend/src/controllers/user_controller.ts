@@ -9,10 +9,11 @@
  */
 export const calculateTotalReactionTime = (playerArr: number[]) => {
     let totalReactionTime: number = 0
-    if (playerArr.length === 10) {
+    if (playerArr.length === 3) {
         for (let i = 0; i < playerArr.length; i++) {
             totalReactionTime += playerArr[i]
         }
     }
-    return Math.round((totalReactionTime / 10) * 10) / 10
+    let sum = (totalReactionTime / 3)
+    return Math.round(sum * 10) / 10
 }
