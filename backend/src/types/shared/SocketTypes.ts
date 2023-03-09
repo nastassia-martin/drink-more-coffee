@@ -5,6 +5,7 @@ export interface ServerToClientEvents {
     playersAnswered: (clicks: boolean) => void
     gameOver: (user: User) => void
     getInfoToLobby: (result: GetGameroomResultLobby) => void
+    bothAnswered: (bothAnswred: boolean, user: User[]) => void
 }
 
 export interface ClientToServerEvents {

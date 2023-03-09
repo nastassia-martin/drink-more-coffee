@@ -23,6 +23,9 @@ let player2AnswerClock = document.querySelector('#player-2-answer-clock') as HTM
 let player1score = document.querySelector('#player-1-score') as HTMLElement
 let player2score = document.querySelector('#player-2-score') as HTMLElement
 
+// Set values for rounds
+let rounds = 1
+let roundsTotal = 10
 
 // Listen for connection
 socket.on('connect', () => {
@@ -60,15 +63,6 @@ socket.on('playerReady', () => {
     })
 })
 
-let rounds = 1
-let roundsTotal = 10
-const roundsDisplay = document.querySelector(".rounds-div")
-
-// Show current round
-const showRounds = () => {
-    roundsDisplay!.textContent = `Runda: ${rounds} / ${roundsTotal}`
-}
-
 // Listen for when cup should show
 socket.on('showCup', (width, height, userArr) => {
     // Remove the answered time and set elements back
@@ -92,7 +86,7 @@ socket.on('showCup', (width, height, userArr) => {
 
     // Start timer for both players
     startTimer()
-    showRounds()
+    document.querySelector(".rounds-div")!.textContent = `Runda: ${rounds} / ${roundsTotal}`
 
     // Listen for clicks on coffee cup
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
@@ -106,8 +100,6 @@ socket.on('showCup', (width, height, userArr) => {
 
         // Emit that the cup is clicked, get back result of who answered first
         socket.emit('cupClicked', x, y, reactionTime, rounds, (userAnswered) => {
-            console.log("length:", userAnswered.data?.length)
-            console.log("data:", userAnswered.data)
             // if one user answered, stop their timer
             if (userAnswered.data?.length === 1) {
                 if (player1NameEl?.innerHTML === `${userAnswered.data[0].nickname}`) {
@@ -120,31 +112,44 @@ socket.on('showCup', (width, height, userArr) => {
                     player2AnswerClock.innerText = `${reactionTime}`
                 }
             }
-            // when both users answered, pause both timers and write out both final times
-            else if (userAnswered.data?.length === 2) {
-                pauseTimer()
-                // Check who's timer is 
-                const player1 = userAnswered.data.find(user => user.nickname === player1NameEl?.innerHTML)
-                const player2 = userAnswered.data.find(user => user.nickname === player2NameEl?.innerHTML)
-
-                if (player1) {
-                    console.log(player1, 'player1')
-                    player1Clock.classList.add('hide-timer')
-                    player1AnswerClock.classList.remove('hide-timer')
-                    player1AnswerClock.innerText = `${player1.reactionTime}`
-                    if (player1.reactionTime) calculateReactionTime(player1.reactionTime)
-                }
-                if (player2) {
-                    console.log(player2, 'player2')
-                    player2Clock.classList.add('hide-timer')
-                    player2AnswerClock.classList.remove('hide-timer')
-                    player2AnswerClock.innerText = `${player2.reactionTime}`
-                    if (player2.reactionTime) calculateReactionTime(player2.reactionTime)
-                }
-            }
         })
     })
 })
+
+socket.on('bothAnswered', (bothAnswered, usersArr) => {
+    updateGameTimers(bothAnswered, usersArr)
+})
+
+
+const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
+    if (bothAnswered) {
+        // uppdatera player 1 och 2
+        const player1 = users.find(user => user.nickname === player1NameEl?.innerHTML)
+        const player2 = users.find(user => user.nickname === player2NameEl?.innerHTML)
+
+        if (player1) {
+            console.log(player1, 'player1')
+            player1Clock.classList.add('hide-timer')
+            player1AnswerClock.classList.remove('hide-timer')
+
+            if (player1.reactionTime) {
+                const reactiontime = calculateReactionTime(player1.reactionTime)
+                player1AnswerClock.innerText = `${reactiontime}`
+            }
+        }
+        if (player2) {
+            console.log(player2, 'player2')
+            player2Clock.classList.add('hide-timer')
+            player2AnswerClock.classList.remove('hide-timer')
+
+            if (player2.reactionTime) {
+                const reactiontime = calculateReactionTime(player2.reactionTime)
+                player2AnswerClock.innerText = `${reactiontime}`
+            }
+        }
+    }
+}
+
 
 /**
  * LOBBY SECTION
@@ -266,7 +271,6 @@ document.querySelector('.go-back-btn')?.addEventListener('click', () => {
 
 // ** Measure reaction time and display timer ** 
 let [tenth, seconds, minutes] = [0, 0, 0]
-
 let int: any = null
 
 const startTimer = () => {
@@ -274,11 +278,6 @@ const startTimer = () => {
         clearInterval(int)
     }
     int = setInterval(displayTimer, 100)
-}
-
-// When timer is paused, replace the li elements with new ones so that timer doesnt updates
-const pauseTimer = () => {
-    clearInterval(int)
 }
 
 const resetTimer = () => {
@@ -307,22 +306,21 @@ const displayTimer = () => {
 }
 
 /**
- * Convert time from 123 format to 00 : 00 : 00
+ * Convert time from 00.0 format to 00 : 00 : 00
  * @param time in tenth of seconds 
  */
 const calculateReactionTime = (time: number) => {
-    // 1 sek = 60 tenth
-    // 1 min = 600 tenth
+    let m: string | number = Math.floor(time / 60)
+    let s: string | number = Math.floor(time - m)
 
-    let total: number = 0
+    let getDecmial = time.toString().indexOf(".")
+    let t: string | number = time.toString().substring(getDecmial + 1)
 
-    const seconds = Math.floor(time / 10)
-    const min = Math.floor(time / 600)
-    const tenthSeconds = time
+    m = m < 10 ? '0' + m : m
+    s = s < 10 ? '0' + s : s
+    t = (Number(t) * 10).toString()
 
-    if (min > 1) {
+    let total = `${m} : ${s} : ${t}`
 
-    }
-
-    console.log('minutes:', minutes, 'seconds:', seconds, 'tenths:', tenthSeconds)
+    return total
 }

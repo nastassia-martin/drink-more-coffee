@@ -118,6 +118,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     success: true,
                     data: usersArr
                 })
+
+                // Emit that both has answered, so that timers can update
+                io.in(gameroomId).emit('bothAnswered', true, usersArr)
+
             } else if (usersAnswered?.length === 1) {
                 let user = usersAnswered?.find(user => user.nickname)
                 let userArr = usersAnswered.map(user => user)
@@ -151,6 +155,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
+
+
     socket.on('getInfoToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
@@ -166,23 +172,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
 
 /**
- * Calculate reaction time in tenth seconds
+ * Convert time from 00 : 00 : 00 format to 00.0
+ * @param time from stopwatch
  */
 const calculateReactionTime = (time: string) => {
     // Get the values from 00 : 00 : 00 format
     const min = time.slice(0, 3)
     const sec = time.slice(5, 8)
-
-    // TA UT EN SIFFRA OCH INTE TVÅ 
     const tenth = time.slice(10, 12)
-    debug(tenth)
 
     // Add the values to total
     let total: number = 0
-    if (min) total = 600 * Number(min)
-    if (sec) total = total + (60 * Number(sec))
-    if (tenth) total = total + (Number(tenth))
 
+    if (min) total = 60 * Number(min)
+    if (sec) total = total + Number(sec)
+    if (tenth) total = total + (Number(tenth) / 10)
+
+    debug(total)
     return total
 }
 
