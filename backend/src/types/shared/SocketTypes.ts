@@ -4,9 +4,7 @@ export interface ServerToClientEvents {
     playerReady: (user: User) => void
     playersAnswered: (clicks: boolean) => void
     gameOver: (user: User) => void
-    getInfoToLobby: (result: GetGameroomResultLobby, recent: GetRecentGamesLobby) => void
-    // getRecentGames: (result: GetRecentGamesLobby) => void
-
+    getInfoToLobby: (result: GetGameroomResultLobby) => void
 }
 
 export interface ClientToServerEvents {
@@ -20,7 +18,6 @@ export interface ClientToServerEvents {
         callback: (result: GetUserResult) => void
     ) => void
     getInfoToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
-    // getRecentGames: (callback: (result: GetRecentGamesLobby) => void) => void
 }
 
 export type User = {

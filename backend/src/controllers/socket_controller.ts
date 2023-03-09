@@ -140,24 +140,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 }
             }
         }
-        // Get 10 latest finished games
-        const recentTenGames = await getTenGames()
+
         const rooms = await getRooms()
 
-        if (recentTenGames && rooms) {
-            const recent = {
-                success: true,
-                data: recentTenGames
-            }
+        if (rooms) {
             const result = {
                 success: true,
                 data: rooms
 
             }
-            socket.broadcast.emit('getInfoToLobby', result, recent)
-
+            socket.broadcast.emit('getInfoToLobby', result)
         }
-
     })
 
     socket.on('getInfoToLobby', async (callback) => {
