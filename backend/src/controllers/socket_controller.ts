@@ -1,7 +1,7 @@
 import Debug from 'debug'
 const debug = Debug('chat:socket_controller')
 
-import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents } from '../types/shared/SocketTypes'
+import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents, UserWonResult } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, updateUser, updateReactionTime, updateScore, disconnectUser } from '../service/user_service'
@@ -128,7 +128,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds <= 10) {
+                if (rounds <= 3) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', x, y, usersArr)
                     }, delay * 1000)
@@ -139,53 +139,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     // If game is over (10 rounds), emit gameOver
                     io.in(gameroomId).emit('bothAnswered', true, usersArr)
                     io.in(gameroomId).emit('gameOver', usersArr)
-
-                    // Recieves objects with results from the client
-                    socket.on('sendResults', async (player1, player2, callback) => {
-
-                        // Gets the average reaction time of each player
-                        const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
-                        const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
-                        let averageArr1: number[] = []
-                        let averageArr2: number[] = []
-                        averageArr1.push(totalPlayer1)
-                        averageArr2.push(totalPlayer2)
-
-                        // Create result in DB with both users
-                        if (player1.users && player2.users) {
-                            await createResult(totalPlayer1, player1.users)
-                            await createResult(totalPlayer2, player2.users)
-
-                            // If player1 won, send back information to the client
-                            if (player1.users.score && player2.users.score) {
-                                if (player1.users.score > player2.users.score) {
-                                    callback({
-                                        success: true,
-                                        data: {
-                                            reactionTimeAvg: averageArr1,
-                                            users: player1.users
-                                        }
-                                    })
-                                    // If player2 won, send back information to the client
-                                } else if (player1.users.score < player2.users.score) {
-                                    callback({
-                                        success: true,
-                                        data: {
-                                            reactionTimeAvg: averageArr2,
-                                            users: player2.users
-                                        }
-                                    })
-                                    // If tie, send back message
-                                } else {
-                                    callback({
-                                        success: false,
-                                        data: null,
-                                        message: 'Oavgjort'
-                                    })
-                                }
-                            }
-                        }
-                    })
                 }
 
                 // ** If game rounds is less than 10  ** 
@@ -250,5 +203,76 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             roomsFinished: finishedRooms,
             results: results
         })
+    })
+
+    socket.on('disconnect', async () => {
+        //await disconnectUser(socket.id)
+    })
+
+    // Recieves objects with results from the client
+    socket.on('sendResults', async (player1, player2) => {
+        debug('1. player 1 and 2 recieved')
+        // Get the current gameroomId
+        const user = await getUser(socket.id)
+        const gameroomId = user?.gameroomId
+        if (gameroomId) {
+            debug('2. gameroomid found')
+            // Gets the average reaction time of each player
+            const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
+            const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
+            let averageArr1: number[] = []
+            let averageArr2: number[] = []
+            averageArr1.push(totalPlayer1)
+            averageArr2.push(totalPlayer2)
+
+            let result: UserWonResult
+
+            // Create result in DB with both users
+            if (player1.users && player2.users) {
+                debug('3. player1 users if statement')
+                await createResult(totalPlayer1, player1.users)
+                await createResult(totalPlayer2, player2.users)
+
+                // If player1 won, send back information to the client
+                if (player1.users.score && player2.users.score) {
+                    debug('4. player1 users score', player1.users.score)
+                    debug('4. player2 users score', player2.users.score)
+                    if (player1.users.score > player2.users.score) {
+                        result = {
+                            success: true,
+                            data: {
+                                reactionTimeAvg: averageArr1,
+                                users: player1.users
+                            }
+                        }
+                        io.in(gameroomId).emit('showResults', result)
+                        debug('player 1 won')
+                        // If player2 won, send back information to the client
+                        // HELLO JOHAN <3<3<3 WE DID NOT USE !! 
+                    } else if (player1.users.score < player2.users.score) {
+                        debug('3. player1 users score', player1.users.score)
+                        debug('3. player2 users score', player2.users.score)
+                        result = {
+                            success: true,
+                            data: {
+                                reactionTimeAvg: averageArr2,
+                                users: player2.users
+                            }
+                        }
+                        io.in(gameroomId).emit('showResults', result)
+                        debug('player 2 won')
+                        // If tie, send back message
+                    } else {
+                        result = {
+                            success: false,
+                            data: null,
+                            message: 'Oavgjort'
+                        }
+                        io.in(gameroomId).emit('showResults', result)
+                        debug('tie')
+                    }
+                }
+            }
+        }
     })
 }
