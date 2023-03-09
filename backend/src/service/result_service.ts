@@ -3,7 +3,7 @@
  */
 
 import prisma from '../prisma'
-import { User, Result } from '../types/shared/SocketTypes'
+import { User } from '../types/shared/SocketTypes'
 
 /**
  * Get all results and their users 
