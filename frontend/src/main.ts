@@ -114,6 +114,10 @@ socket.on('bothAnswered', (bothAnswered, usersArr) => {
 socket.on('gameOver', (usersArr) => {
     // Emit results objects to server
     sendResultsToServer(usersArr)
+
+    socket.on('showResults', result => {
+        displayGameOverPage(result)
+    })
 })
 
 socket.on('getInfoToLobby', (result) => {
@@ -194,10 +198,10 @@ const sendResultsToServer = (users: User[]) => {
         }
     }
     // Emit result objects to server
-    socket.emit('sendResults', player1Result, player2Result, (result) => {
-        displayGameOverPage(result)
-    })
+    socket.emit('sendResults', player1Result, player2Result)
 }
+
+
 
 /**
  * Update the stopwatches and add reactiontimes to array

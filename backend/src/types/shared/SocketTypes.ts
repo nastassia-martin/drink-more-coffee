@@ -6,6 +6,7 @@ export interface ServerToClientEvents {
     gameOver: (users: User[]) => void
     getInfoToLobby: (result: GetGameroomResultLobby) => void
     bothAnswered: (bothAnswred: boolean, user: User[]) => void
+    showResults: (result: UserWonResult) => void
 }
 
 export interface ClientToServerEvents {
@@ -19,7 +20,7 @@ export interface ClientToServerEvents {
         callback: (result: GetUserResult) => void
     ) => void
     getInfoToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
-    sendResults: (player1: Result, player2: Result, callback: (result: UserWonResult) => void) => void
+    sendResults: (player1: Result, player2: Result) => void
 }
 
 export type User = {

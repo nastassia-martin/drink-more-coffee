@@ -1,7 +1,7 @@
 import Debug from 'debug'
 const debug = Debug('chat:socket_controller')
 
-import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents } from '../types/shared/SocketTypes'
+import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents, UserWonResult } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
@@ -107,7 +107,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds <= 10) {
+                if (rounds <= 3) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', x, y, usersArr)
                     }, delay * 1000)
@@ -120,8 +120,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     io.in(gameroomId).emit('gameOver', usersArr)
 
                     // Recieves objects with results from the client
-                    socket.on('sendResults', async (player1, player2, callback) => {
-
+                    socket.on('sendResults', async (player1, player2) => {
                         // Gets the average reaction time of each player
                         const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
                         const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
@@ -129,6 +128,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                         let averageArr2: number[] = []
                         averageArr1.push(totalPlayer1)
                         averageArr2.push(totalPlayer2)
+
+                        let result: UserWonResult
 
                         // Create result in DB with both users
                         if (player1.users && player2.users) {
@@ -138,29 +139,32 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             // If player1 won, send back information to the client
                             if (player1.users.score && player2.users.score) {
                                 if (player1.users.score > player2.users.score) {
-                                    callback({
+                                    result = {
                                         success: true,
                                         data: {
                                             reactionTimeAvg: averageArr1,
                                             users: player1.users
                                         }
-                                    })
+                                    }
+                                    io.in(gameroomId).emit('showResults', result)
                                     // If player2 won, send back information to the client
                                 } else if (player1.users.score < player2.users.score) {
-                                    callback({
+                                    result = {
                                         success: true,
                                         data: {
                                             reactionTimeAvg: averageArr2,
                                             users: player2.users
                                         }
-                                    })
+                                    }
+                                    io.in(gameroomId).emit('showResults', result)
                                     // If tie, send back message
                                 } else {
-                                    callback({
+                                    result = {
                                         success: false,
                                         data: null,
                                         message: 'Oavgjort'
-                                    })
+                                    }
+                                    io.in(gameroomId).emit('showResults', result)
                                 }
                             }
                         }
