@@ -1,6 +1,6 @@
 import './assets/scss/style.scss'
 import { io, Socket } from 'socket.io-client'
-import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, GetRecentGamesLobby, Result } from '@backend/types/shared/SocketTypes'
+import { ClientToServerEvents, User, ServerToClientEvents, GetGameroomResultLobby, Result } from '@backend/types/shared/SocketTypes'
 
 // Connect to Socket.IO server
 const SOCKET_HOST = import.meta.env.VITE_APP_SOCKET_HOST
@@ -242,6 +242,11 @@ document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     })
 })
 
+// Till update lobby: 
+// result & rooms 
+// uppdatera getInfoToLobby med result & rooms
+
+
 // ** Update lobby DOM **
 const updateLobby = (result: GetGameroomResultLobby) => {
     document.querySelector('.ongoing-games-column')!.innerHTML = `<h3>Pågående spel</h3>`
@@ -251,27 +256,45 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     <h3>Highscore</h3>
     <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
 
-    // Check that the scores updates in realtime
-    result.data?.forEach(room => {
+
+    // Write out ongoing games with nicknames and scores
+    result.rooms?.forEach(room => {
         if (room.users && room.users.length === 2) {
-            // Write out ongoing games with nicknames and scores
             document.querySelector('.ongoing-games-column')!.innerHTML += `
                     <li class="ongoing-list">
                         <span>${room.users[0].nickname} | ${room.users[1].nickname}</span>
                         <span>${room.users[0].score} - ${room.users[1].score}</span>
                     </li>
                 `
+        }
+    })
 
-            // Write out top 10 highscores
+    // Write out top 10 highscores
+    result.results?.forEach(result => {
+        result.users?.forEach(user => {
             document.querySelector('.highscore-column')!.innerHTML += `
                 <li class="highscore-list">
-                    <span>${room.users[0].nickname} | 0.5 sek </span>
+                    <span>${user.nickname} | ${result.reactionTimeAvg} </span>
                 </li>
             `
-        }
-
-
+        })
     })
+
+    // Write out 10 last games
+    result.results?.forEach(result => {
+        document.querySelector('.recent-games-column')!.innerHTML += `
+        <li class="recent-games-list">
+
+        </li>
+        `
+        result.users?.forEach(user => {
+            document.querySelector('.recent-games-list')!.innerHTML += `
+                    <span>${user.nickname}: ${user.score}</span>
+            `
+        })
+    })
+
+    console.log(result)
 }
 
 

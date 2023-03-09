@@ -1,14 +1,15 @@
 import Debug from 'debug'
 const debug = Debug('chat:socket_controller')
 
-import { ClientToServerEvents, ServerToClientEvents } from '../types/shared/SocketTypes'
+import { ClientToServerEvents, GetGameroomResultLobby, ServerToClientEvents } from '../types/shared/SocketTypes'
 import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, disconnectUser, updateUser, updateReactionTime, updateScore } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomiseDelay } from './room_controller'
 import { getRoom, updateRounds, getRooms, getTenGames } from '../service/gameroom_service'
-import { createResult } from '../service/result_service'
+import { createResult, getResults } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
+import { Result } from 'express-validator'
 
 export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     debug('A user connected', socket.id)
@@ -197,12 +198,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
 
         const rooms = await getRooms()
+        const results = await getResults()
 
         if (rooms) {
-            const result = {
+            const result: GetGameroomResultLobby = {
                 success: true,
-                data: rooms
-
+                rooms: rooms,
+                results: results
             }
             socket.broadcast.emit('getInfoToLobby', result)
         }
@@ -211,11 +213,13 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
     socket.on('getInfoToLobby', async (callback) => {
         // Get rooms and their users 
         const rooms = await getRooms()
+        const results = await getResults()
 
-        if (rooms) {
+        if (rooms && results) {
             callback({
                 success: true,
-                data: rooms
+                rooms: rooms,
+                results: results
             })
         }
     })
