@@ -19,7 +19,7 @@ export interface ClientToServerEvents {
         callback: (result: GetUserResult) => void
     ) => void
     getInfoToLobby: (callback: (result: GetGameroomResultLobby) => void) => void
-    sendResults: (player1: Result, player2: Result) => void
+    sendResults: (player1: Result, player2: Result, callback: (result: UserWonResult) => void) => void
 }
 
 export type User = {
@@ -38,7 +38,7 @@ export type GameRoom = {
 }
 
 export type Result = {
-    reactionTimeAvg: number[]
+    reactionTimeAvg: number[] | number
     users: User | null
 }
 
@@ -62,4 +62,9 @@ export interface GetRecentGamesLobby {
     data: GameRoom[] | null
 }
 
+export interface UserWonResult {
+    success: boolean,
+    data: Result | null,
+    message?: string
+}
 

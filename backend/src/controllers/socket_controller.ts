@@ -108,41 +108,58 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds <= 3) {
+                if (rounds <= 5) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', width, height, usersArr)
                     }, delay * 1000)
                 } else {
-                    // If game is over (10 rounds), send two results with each users times
+                    // If game is over (10 rounds), send back who won to the client
                     io.in(gameroomId).emit('bothAnswered', true, usersArr)
                     io.in(gameroomId).emit('gameOver', usersArr)
-
                     // Recieves objects with results from the client
-                    socket.on('sendResults', async (player1, player2) => {
-                        debug('player1:', player1, 'player2:', player2)
+                    socket.on('sendResults', async (player1, player2, callback) => {
 
                         // Gets the average reaction time of each player
                         const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
                         const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
 
-                        debug(totalPlayer1, totalPlayer2)
-
-                        // Create result in DB
+                        // Create result in DB with both users
                         if (player1.users && player2.users) {
-                            const player1res = await createResult(totalPlayer1, player1.users)
-                            const player2res = await createResult(totalPlayer2, player2.users)
-                            debug(player1res, 'player1res')
+                            const resultPlayer1 = await createResult(totalPlayer1, player1.users)
+                            const resultPlayer2 = await createResult(totalPlayer2, player2.users)
 
                             if (player1.users.score && player2.users.score) {
                                 if (player1.users.score > player2.users.score) {
+                                    callback({
+                                        success: true,
+                                        data: {
+                                            reactionTimeAvg: resultPlayer1.reactionTimeAvg,
+                                            users: player1.users
+                                        }
+                                    })
                                     debug('player 1 is the winner')
-                                } else {
+                                    // callback i gameover för att berätta vem som vann
+                                } else if (player1.users.score < player2.users.score) {
                                     debug('player 2 is the winner')
+                                    callback({
+                                        success: true,
+                                        data: {
+                                            reactionTimeAvg: resultPlayer2.reactionTimeAvg,
+                                            users: player2.users
+                                        }
+                                    })
+                                } else {
+                                    debug('det blev jämnt')
+                                    callback({
+                                        success: false,
+                                        data: null,
+                                        message: 'Det blev oavgjort'
+                                    })
                                 }
-
                             }
                         }
                     })
+
                 }
                 // Unset reactiontime in DB
                 usersArr.forEach(async (user) => {

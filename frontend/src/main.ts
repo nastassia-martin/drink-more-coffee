@@ -181,8 +181,9 @@ const sendResultsToServer = (users: User[]) => {
         }
     }
     // Emit result objects to server
-    socket.emit('sendResults', player1Result, player2Result)
-    console.log('emitted', player1Result.reactionTimeAvg, player2Result.reactionTimeAvg)
+    socket.emit('sendResults', player1Result, player2Result, (result) => {
+        console.log('player 1 vann', result)
+    })
 }
 
 
