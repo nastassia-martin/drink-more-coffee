@@ -10,6 +10,9 @@ import { User, Result } from '../types/shared/SocketTypes'
  */
 export const getResults = async () => {
     return await prisma.result.findMany({
+        orderBy: {
+            reactionTimeAvg: 'asc'
+        },
         include: {
             users: true
         }
