@@ -46,7 +46,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         if (user && user?.gameroomId) {
             const room = await getRoom(user?.gameroomId)
             await disconnectUser(socket.id)
-            debug('user disconnected from game', socket.id)
 
             if (room) {
                 io.in(room?.id).emit('userDisconnected', user)
@@ -57,7 +56,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 await disconnectUser(room2?.users[0].id)
 
                 const deleteroom = await disconnectGameroom(room2?.id)
-                debug('room deleted:', deleteroom)
             }
         }
 
@@ -189,14 +187,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             })
         }
     })
-
-    // socket.on('disconnect', async () => {
-    //     await disconnectUser(socket.id)
-    //     debug('user disconnected from game')
-
-    //     io.in(availableRoomId).emit('userDisconnected', user)
-
-    // })
 }
 
 

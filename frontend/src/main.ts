@@ -56,7 +56,6 @@ socket.on('playerReady', () => {
     // Emit to server that the game is ready to start
     socket.emit('startGame', x, y, (gameroom) => {
         document.querySelector('.playerLeft')!.classList.add('hide')
-        // document.querySelector('.goto-start')!.classList.add('hide')
 
         if (gameroom.data?.users) {
             // Display players name
@@ -120,7 +119,6 @@ socket.on('showCup', (width, height, userArr) => {
 
 const hideAndShow = () => {
     document.querySelector('.playerLeft')!.classList.remove('hide')
-    // document.querySelector('.goto-start')!.classList.remove('hide')
     document.querySelector('#game-grid')!.classList.add('hide')
     document.querySelector('#player-2-clock')!.classList.add('hide')
     document.querySelector('#player-1-clock')!.classList.add('hide')
@@ -164,7 +162,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
         const player2 = users.find(user => user.nickname === player2NameEl?.innerHTML)
 
         if (player1) {
-            console.log(player1, 'player1')
             player1Clock.classList.add('hide-timer')
             player1AnswerClock.classList.remove('hide-timer')
 
@@ -174,7 +171,6 @@ const updateGameTimers = (bothAnswered: boolean, users: User[]) => {
             }
         }
         if (player2) {
-            console.log(player2, 'player2')
             player2Clock.classList.add('hide-timer')
             player2AnswerClock.classList.remove('hide-timer')
 
