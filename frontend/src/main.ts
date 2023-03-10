@@ -358,7 +358,7 @@ const displayGameOverPage = (result: UserWonResult) => {
 
     if (result.message === 'Oavgjort') {
         document.querySelector('.letter-title')!.innerHTML = `
-        <h3>${result.data?.users?.nickname}</h3>
+        <h3>Oavgjort</h3>
         `
     } else {
         document.querySelector('.letter-title')!.innerHTML = `
