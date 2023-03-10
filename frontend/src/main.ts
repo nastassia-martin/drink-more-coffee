@@ -327,6 +327,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 // ** Display game over page ** 
 const displayGameOverPage = (result: UserWonResult) => {
+    console.log(result)
     const gameOver = document.querySelector('.gameover-container')
 
     gameOver!.classList.remove('hide')
@@ -343,7 +344,7 @@ const displayGameOverPage = (result: UserWonResult) => {
                 <div class="back-fold"></div>
                 <div class="letter">
                     <div class="letter-title">
-                        <h3>${result.data?.users?.nickname}</h3>
+                        
                     </div>
                 </div>
                 <div class="top-fold"></div>
@@ -354,10 +355,22 @@ const displayGameOverPage = (result: UserWonResult) => {
         </div>  
     </div>  
     `
+
+    if (result.message === 'Oavgjort') {
+        document.querySelector('.letter-title')!.innerHTML = `
+        <h3>${result.data?.users?.nickname}</h3>
+        `
+    } else {
+        document.querySelector('.letter-title')!.innerHTML = `
+        <h3>${result.data?.users?.nickname}</h3>
+        `
+    }
+
     // ** If 'tillbaka till start' pressed, hide lobby and show start-view ** 
     document.querySelector('.play-again')?.addEventListener('click', () => {
         document.querySelector('.gameover-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
+        window.location.reload()
     })
 }
 
