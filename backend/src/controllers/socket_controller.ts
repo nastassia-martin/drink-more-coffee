@@ -231,8 +231,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 await createResult(totalPlayer2, player2.users)
 
                 // If player1 won, send back information to the client
-                if (player1.users.score && player2.users.score) {
-                    if (player1.users.score > player2.users.score) {
+                if (player1.users.score || player2.users.score) {
+                    if (player1.users.score! > player2.users.score!) {
                         result = {
                             success: true,
                             data: {
@@ -242,7 +242,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                         }
                         io.in(gameroomId).emit('showResults', result)
                         // If player2 won, send back information to the client
-                    } else if (player1.users.score < player2.users.score) {
+                    } else if (player1.users.score! < player2.users.score!) {
                         result = {
                             success: true,
                             data: {
