@@ -211,12 +211,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
     // Recieves objects with results from the client
     socket.on('sendResults', async (player1, player2) => {
-        debug('1. player 1 and 2 recieved')
         // Get the current gameroomId
         const user = await getUser(socket.id)
         const gameroomId = user?.gameroomId
         if (gameroomId) {
-            debug('2. gameroomid found')
             // Gets the average reaction time of each player
             const totalPlayer1 = calculateTotalReactionTime(player1.reactionTimeAvg)
             const totalPlayer2 = calculateTotalReactionTime(player2.reactionTimeAvg)
@@ -229,14 +227,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
             // Create result in DB with both users
             if (player1.users && player2.users) {
-                debug('3. player1 users if statement')
                 await createResult(totalPlayer1, player1.users)
                 await createResult(totalPlayer2, player2.users)
 
                 // If player1 won, send back information to the client
                 if (player1.users.score && player2.users.score) {
-                    debug('4. player1 users score', player1.users.score)
-                    debug('4. player2 users score', player2.users.score)
                     if (player1.users.score > player2.users.score) {
                         result = {
                             success: true,
@@ -246,12 +241,8 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             }
                         }
                         io.in(gameroomId).emit('showResults', result)
-                        debug('player 1 won')
                         // If player2 won, send back information to the client
-                        // HELLO JOHAN <3<3<3 WE DID NOT USE !! 
                     } else if (player1.users.score < player2.users.score) {
-                        debug('3. player1 users score', player1.users.score)
-                        debug('3. player2 users score', player2.users.score)
                         result = {
                             success: true,
                             data: {
@@ -260,7 +251,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             }
                         }
                         io.in(gameroomId).emit('showResults', result)
-                        debug('player 2 won')
                         // If tie, send back message
                     } else {
                         result = {
@@ -269,7 +259,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                             message: 'Oavgjort'
                         }
                         io.in(gameroomId).emit('showResults', result)
-                        debug('tie')
                     }
                 }
             }

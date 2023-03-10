@@ -140,7 +140,6 @@ socket.on('gameOver', (usersArr) => {
 })
 
 socket.on('showResults', result => {
-    console.log(result)
     displayGameOverPage(result)
 })
 
@@ -223,7 +222,6 @@ const sendResultsToServer = (users: User[]) => {
     }
     // Emit result objects to server
     socket.emit('sendResults', player1Result, player2Result)
-    console.log('emitted sendresults', player1Result, player2Result)
 }
 
 /**
