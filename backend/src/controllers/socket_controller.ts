@@ -40,7 +40,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // Emit playerReady to the client
             io.in(availableRoomId).emit('playerReady', user)
         }
-
     })
 
     socket.on('disconnect', async () => {
@@ -64,17 +63,17 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             // await getOngoingGames(false)
         }
 
-        // const ongoingRooms = await getOngoingGames(false)
-        // const finishedRooms = await getOngoingGames(true)
-        // const results = await getResults()
+        const ongoingRooms = await getOngoingGames(true)
+        const finishedRooms = await getOngoingGames(false)
+        const results = await getResults()
 
-        // const result: GetGameroomResultLobby = {
-        //     success: false,
-        //     roomsOngoing: ongoingRooms,
-        //     roomsFinished: finishedRooms,
-        //     results: results
-        // }
-        // socket.broadcast.emit('getInfoToLobby', result)
+        const result: GetGameroomResultLobby = {
+            success: true,
+            roomsOngoing: ongoingRooms,
+            roomsFinished: finishedRooms,
+            results: results
+        }
+        socket.broadcast.emit('getInfoToLobby', result)
     })
 
     socket.on('startGame', async (callback) => {
