@@ -435,6 +435,7 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
     document.querySelector('.lobby-container')!.classList.add('hide')
+    window.location.reload()
 })
 
 // ** Measure reaction time and display timer ** 

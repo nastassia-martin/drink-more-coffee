@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 import { io } from '../../server'
 import { createUser, getUser, updateUser, updateReactionTime, updateScore, disconnectUser } from '../service/user_service'
 import { checkAvailableRooms, checkPlayerStatus, calculateReactionTime, randomiseDelay } from './room_controller'
-import { getRoom, updateRounds, updateUserConnected, getOngoingGames, disconnectGameroom, tenLastGames } from '../service/gameroom_service'
+import { getRoom, updateRounds, updateUserConnected, getOngoingGames, disconnectGameroom } from '../service/gameroom_service'
 import { createResult, getResults } from '../service/result_service'
 import { calculateTotalReactionTime } from './user_controller'
 
@@ -47,7 +47,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         const user = await getUser(socket.id)
         if (user && user?.gameroomId) {
             const room = await getRoom(user?.gameroomId)
-            await disconnectUser(socket.id)
+            debug(user, "user1")
 
             if (room) {
                 io.in(room?.id).emit('userDisconnected', user)
@@ -56,8 +56,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room2 = await getRoom(user?.gameroomId)
             if (room2?.users[0].id) {
                 await disconnectUser(room2?.users[0].id)
+                debug(room2, "user2")
 
-                const deleteroom = await disconnectGameroom(room2?.id)
+                await disconnectGameroom(room2?.id)
             }
         }
     })
@@ -178,7 +179,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
 
         // ** Emit lobby results each time a score is given ** 
         const ongoingRooms = await getOngoingGames(true)
-        const finishedRooms = await tenLastGames(true)
+        const finishedRooms = await getOngoingGames(false)
         const results = await getResults()
 
         const result: GetGameroomResultLobby = {
