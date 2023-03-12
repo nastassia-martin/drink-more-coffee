@@ -10,6 +10,7 @@ import { User } from '../types/shared/SocketTypes'
  */
 export const getResults = async () => {
     return await prisma.result.findMany({
+        take: 20,
         orderBy: {
             reactionTimeAvg: 'asc'
         },

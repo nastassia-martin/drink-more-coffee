@@ -29,6 +29,21 @@ export const getOngoingGames = async (connected: boolean) => {
     })
 }
 
+export const tenLastGames = async (connected: boolean) => {
+    return await prisma.gameroom.findMany({
+        take: 10,
+        where: {
+            userConnected: false,
+            rounds: {
+                gt: 9
+            },
+        },
+        include: {
+            users: true
+        }
+    })
+}
+
 /**
  * Get a specific room by gameroomId
  */
