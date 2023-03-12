@@ -109,9 +109,12 @@ export const updateUserConnected = async (gameroomId: string) => {
 }
 
 export const disconnectGameroom = async (gameroomId: string) => {
-    await prisma.gameroom.delete({
+    await prisma.gameroom.deleteMany({
         where: {
-            id: gameroomId
+            id: gameroomId,
+            rounds: {
+                lt: 10
+            }
         }
     })
 }

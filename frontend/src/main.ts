@@ -113,8 +113,6 @@ socket.on('showCup', (x, y, userArr) => {
 const hideAndShow = () => {
     document.querySelector('.playerLeft')!.classList.remove('hide')
     document.querySelector('#game-grid')!.classList.add('hide')
-    /*  document.querySelector('#player-2-clock')!.classList.add('hide')
-     document.querySelector('#player-1-clock')!.classList.add('hide') */
 }
 
 socket.on('userDisconnected', () => {

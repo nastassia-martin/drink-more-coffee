@@ -58,9 +58,23 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 await disconnectUser(room2?.users[0].id)
                 debug(room2, "user2")
 
-                await disconnectGameroom(room2?.id)
+                const deleteroom = await disconnectGameroom(room2?.id)
+                debug(deleteroom, "deleted room")
             }
+            // await getOngoingGames(false)
         }
+
+        // const ongoingRooms = await getOngoingGames(false)
+        // const finishedRooms = await getOngoingGames(true)
+        // const results = await getResults()
+
+        // const result: GetGameroomResultLobby = {
+        //     success: false,
+        //     roomsOngoing: ongoingRooms,
+        //     roomsFinished: finishedRooms,
+        //     results: results
+        // }
+        // socket.broadcast.emit('getInfoToLobby', result)
     })
 
     socket.on('startGame', async (callback) => {
@@ -205,9 +219,10 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         })
     })
 
-    socket.on('disconnect', async () => {
-        //await disconnectUser(socket.id)
-    })
+    // socket.on('disconnect', async () => {
+    //     //await disconnectUser(socket.id)
+    //     debug('a user disconnected', socket.id)
+    // })
 
     // Recieves objects with results from the client
     socket.on('sendResults', async (player1, player2) => {
