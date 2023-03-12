@@ -127,6 +127,8 @@ socket.on('userDisconnected', () => {
     document.querySelector('.goto-start')!.addEventListener('click', () => {
         document.querySelector('.game-room-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
+        window.location.reload()
+
     })
 })
 
@@ -358,6 +360,7 @@ const displayGameOverPage = (result: UserWonResult) => {
     document.querySelector('.play-again')?.addEventListener('click', () => {
         document.querySelector('.gameover-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
+        window.location.reload()
     })
 }
 
