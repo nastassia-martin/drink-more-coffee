@@ -127,7 +127,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 // Randomise delay 
                 const delay = randomiseDelay()
 
-                if (rounds <= 2) {
+                if (rounds <= 10) {
                     setTimeout(() => {
                         io.in(gameroomId).emit('showCup', x, y, usersArr)
                     }, delay * 1000)
@@ -262,5 +262,18 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                 }
             }
         }
+
+        // ** Emit lobby results each time a score is given ** 
+        const ongoingRooms = await getOngoingGames(true)
+        const finishedRooms = await getOngoingGames(false)
+        const results = await getResults()
+
+        const result: GetGameroomResultLobby = {
+            success: true,
+            roomsOngoing: ongoingRooms,
+            roomsFinished: finishedRooms,
+            results: results
+        }
+        socket.broadcast.emit('getInfoToLobby', result)
     })
 }

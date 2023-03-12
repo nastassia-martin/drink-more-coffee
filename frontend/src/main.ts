@@ -289,6 +289,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
 
 
+
     // Write out ongoing games with nicknames and scores
     result.roomsOngoing?.forEach(room => {
         if (room.users && room.users.length === 2) {
@@ -304,11 +305,13 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     // Write out top 10 highscores
     result.results?.forEach(result => {
         result.users?.forEach(user => {
-            document.querySelector('.highscore-column')!.innerHTML += `
+            if (user.nickname || result.reactionTimeAvg) {
+                document.querySelector('.highscore-column')!.innerHTML += `
                 <li class="highscore-list">
                     <span>${user.nickname} | ${result.reactionTimeAvg} </span>
                 </li>
             `
+            }
         })
     })
 
