@@ -120,10 +120,11 @@ const hideAndShow = () => {
 socket.on('userDisconnected', () => {
     hideAndShow()
     document.querySelector('.playerLeft')!.innerHTML = `
-    <h2>Oh No!! <br> Din motspelare tröttnade på att spela...</h2>
+    <h2>Oh No!</h2>
+    <p>Din motspelare tröttnade på att spela...</p>
     <button class="goto-start">Gå tillbaka till start?</button>
-
     `
+    resetTimer()
     document.querySelector('.goto-start')!.addEventListener('click', () => {
         document.querySelector('.game-room-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')

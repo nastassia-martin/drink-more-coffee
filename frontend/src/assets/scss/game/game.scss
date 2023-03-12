@@ -125,20 +125,26 @@ $ff-header: 'Annie Use Your Telescope', cursive;
 }
 
 .playerLeft {
-    width: 40%;
-    height: 40%;
+    width: 100%;
+    height: 80%;
     background-color: rgb(206, 104, 82);
     padding: 2rem;
     position: absolute;
     z-index: 1;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    // font-size: 1.5rem;
+    color: #F7E6E2;
 
     h2 {
         text-align: center;
         font-size: 1.5rem;
         color: #F7E6E2;
+    }
+
+    p {
+        margin-top: 1rem;
     }
 
     .goto-start {
@@ -151,8 +157,7 @@ $ff-header: 'Annie Use Your Telescope', cursive;
         font-size: 1.5rem;
         margin-top: 1.5rem;
         z-index: 2;
-
-
+        align-self: center;
     }
 }
 
