@@ -55,6 +55,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room2 = await getRoom(user?.gameroomId)
             if (room2?.users[0].id) {
                 await disconnectUser(room2?.users[0].id)
+                await disconnectUser(room2.users[1].id)
                 debug(room2, "user2")
 
                 const deleteroom = await disconnectGameroom(room2?.id)
