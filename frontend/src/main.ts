@@ -285,8 +285,8 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     document.querySelector('.recent-games-column')!.innerHTML = `
     <h3>10 senaste matcherna</h3>`
     document.querySelector('.highscore-column')!.innerHTML = `
-    <h3>Highscore</h3>
-    <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
+    <h3>Topp 10 highscores</h3>
+`
 
 
 
