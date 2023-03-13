@@ -85,8 +85,6 @@ socket.on('showCup', (x, y, userArr) => {
 
     // When coffee cup clicked, emit to server
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
-        rounds++ // Add rounds
-
         // Get the reaction time from the stopwatch
         const reactionTime = document.querySelector('.player-clock')!.innerHTML
 
@@ -113,17 +111,16 @@ socket.on('showCup', (x, y, userArr) => {
 const hideAndShow = () => {
     document.querySelector('.playerLeft')!.classList.remove('hide')
     document.querySelector('#game-grid')!.classList.add('hide')
-    /*  document.querySelector('#player-2-clock')!.classList.add('hide')
-     document.querySelector('#player-1-clock')!.classList.add('hide') */
 }
 
 socket.on('userDisconnected', () => {
     hideAndShow()
     document.querySelector('.playerLeft')!.innerHTML = `
-    <h2>Oh No!! <br> Din motspelare tröttnade på att spela...</h2>
+    <h2>Oh No!</h2>
+    <p>Din motspelare tröttnade på att spela...</p>
     <button class="goto-start">Gå tillbaka till start?</button>
-
     `
+    resetTimer()
     document.querySelector('.goto-start')!.addEventListener('click', () => {
         document.querySelector('.game-room-container')!.classList.add('hide')
         document.querySelector('.start-container')!.classList.remove('hide')
@@ -291,6 +288,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     <h2>Snabbaste genomsnittliga reaktionstiden: <br>`
 
 
+
     // Write out ongoing games with nicknames and scores
     result.roomsOngoing?.forEach(room => {
         if (room.users && room.users.length === 2) {
@@ -306,11 +304,13 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     // Write out top 10 highscores
     result.results?.forEach(result => {
         result.users?.forEach(user => {
-            document.querySelector('.highscore-column')!.innerHTML += `
+            if (user.nickname || result.reactionTimeAvg) {
+                document.querySelector('.highscore-column')!.innerHTML += `
                 <li class="highscore-list">
                     <span>${user.nickname} | ${result.reactionTimeAvg} </span>
                 </li>
             `
+            }
         })
     })
 
@@ -329,6 +329,7 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 // ** Display game over page ** 
 const displayGameOverPage = (result: UserWonResult) => {
+    console.log(result)
     const gameOver = document.querySelector('.gameover-container')
 
     gameOver!.classList.remove('hide')
@@ -345,7 +346,7 @@ const displayGameOverPage = (result: UserWonResult) => {
                 <div class="back-fold"></div>
                 <div class="letter">
                     <div class="letter-title">
-                        <h3>${result.data?.users?.nickname}</h3>
+                        
                     </div>
                 </div>
                 <div class="top-fold"></div>
@@ -356,6 +357,17 @@ const displayGameOverPage = (result: UserWonResult) => {
         </div>  
     </div>  
     `
+
+    if (result.message === 'Oavgjort') {
+        document.querySelector('.letter-title')!.innerHTML = `
+        <h3>Oavgjort</h3>
+        `
+    } else {
+        document.querySelector('.letter-title')!.innerHTML = `
+        <h3>${result.data?.users?.nickname}</h3>
+        `
+    }
+
     // ** If 'tillbaka till start' pressed, hide lobby and show start-view ** 
     document.querySelector('.play-again')?.addEventListener('click', () => {
         document.querySelector('.gameover-container')!.classList.add('hide')
@@ -421,6 +433,7 @@ document.querySelector('#nickname-form')?.addEventListener('submit', (e) => {
 document.querySelector('.go-back-btn')?.addEventListener('click', () => {
     document.querySelector('.start-container')!.classList.remove('hide')
     document.querySelector('.lobby-container')!.classList.add('hide')
+    window.location.reload()
 })
 
 // ** Measure reaction time and display timer ** 
