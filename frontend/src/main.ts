@@ -85,6 +85,7 @@ socket.on('showCup', (x, y, userArr) => {
 
     // When coffee cup clicked, emit to server
     document.querySelector('#coffee-virus')?.addEventListener('click', () => {
+        rounds++
         // Get the reaction time from the stopwatch
         const reactionTime = document.querySelector('.player-clock')!.innerHTML
 
