@@ -33,7 +33,6 @@ socket.on('connect', () => {
 // Listen for disconnect
 socket.on('disconnect', () => {
     console.log('Disconnected from the server')
-
 })
 
 // Listen for if player waiting
@@ -178,7 +177,6 @@ const updateScoreAndTimer = (userArr: User[]) => {
     resetTimer()
 }
 
-
 /**
  * Create objects with players results and emit to server
  * @param users array of users to send result of
@@ -267,7 +265,6 @@ const addReactionTime = (reactionTime: number, playerArr: number[]) => {
     playerArr.push(reactionTime)
 }
 
-
 document.querySelector('.to-lobby-btn')!.addEventListener('click', () => {
     // ** Hide start-view and display lobby **
     document.querySelector('.lobby-container')!.classList.remove('hide')
@@ -287,8 +284,6 @@ const updateLobby = (result: GetGameroomResultLobby) => {
     document.querySelector('.highscore-column')!.innerHTML = `
     <h3>Topp 10 highscores</h3>
 `
-
-
 
     // Write out ongoing games with nicknames and scores
     result.roomsOngoing?.forEach(room => {
@@ -330,7 +325,6 @@ const updateLobby = (result: GetGameroomResultLobby) => {
 
 // ** Display game over page ** 
 const displayGameOverPage = (result: UserWonResult) => {
-    console.log(result)
     const gameOver = document.querySelector('.gameover-container')
 
     gameOver!.classList.remove('hide')

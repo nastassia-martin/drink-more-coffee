@@ -20,7 +20,6 @@ export const getResults = async () => {
     })
 }
 
-
 /**
  * Create result with reaction time average and user
  */

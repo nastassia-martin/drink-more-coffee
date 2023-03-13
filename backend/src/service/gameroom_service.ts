@@ -29,21 +29,6 @@ export const getOngoingGames = async (connected: boolean) => {
     })
 }
 
-// export const tenLastGames = async (connected: boolean) => {
-//     return await prisma.gameroom.findMany({
-//         take: 10,
-//         where: {
-//             userConnected: connected,
-//             rounds: {
-//                 gt: 9
-//             },
-//         },
-//         include: {
-//             users: true
-//         }
-//     })
-// }
-
 /**
  * Get a specific room by gameroomId
  */
@@ -108,6 +93,9 @@ export const updateUserConnected = async (gameroomId: string) => {
     })
 }
 
+/**
+ * Disconnect room when one player disconnects early before 10 rounds are played
+ */
 export const disconnectGameroom = async (gameroomId: string) => {
     await prisma.gameroom.deleteMany({
         where: {

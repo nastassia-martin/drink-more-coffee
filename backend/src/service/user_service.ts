@@ -6,13 +6,6 @@ import prisma from '../prisma'
 import { GameRoom, User } from '../types/shared/SocketTypes'
 
 /**
- * Get all the users
- */
-/* export const getUsers = async (user: User) => {
-    return await prisma.user.findMany()
-} */
-
-/**
  * Get one user 
  */
 export const getUser = async (socketId: string) => {
@@ -75,7 +68,7 @@ export const updateReactionTime = async (userId: string, reactionTime: number) =
 }
 
 /**
- * 
+ * Update user with score
  */
 export const updateScore = async (userId: string, score: number) => {
     return await prisma.user.update({
@@ -90,8 +83,6 @@ export const updateScore = async (userId: string, score: number) => {
 
 /**
  * DELETE user from DB
- * @param userId socket.id
- * @returns deletes user from DB
  */
 export const disconnectUser = async (userId: string) => {
     await prisma.user.deleteMany({

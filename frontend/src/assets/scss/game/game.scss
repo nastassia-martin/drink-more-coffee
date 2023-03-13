@@ -34,7 +34,7 @@ $ff-header: 'Annie Use Your Telescope', cursive;
     grid-template-columns: repeat(10, 1fr);
     grid-template-rows: repeat(10, 1fr);
     // width: 100vw;
-    height: 70vh;
+    height: 60vh;
     background-color: #F7E6E2;
 
     >* {
@@ -134,7 +134,6 @@ $ff-header: 'Annie Use Your Telescope', cursive;
     display: flex;
     flex-direction: column;
     text-align: center;
-    // font-size: 1.5rem;
     color: #F7E6E2;
 
     h2 {
@@ -160,8 +159,6 @@ $ff-header: 'Annie Use Your Telescope', cursive;
         align-self: center;
     }
 }
-
-
 
 .coffee {
     width: 5rem;

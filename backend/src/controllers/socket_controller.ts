@@ -42,11 +42,11 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         }
     })
 
+    //Listen for when user disconnects
     socket.on('disconnect', async () => {
         const user = await getUser(socket.id)
         if (user && user?.gameroomId) {
             const room = await getRoom(user?.gameroomId)
-            debug(user, "user1")
 
             if (room) {
                 io.in(room?.id).emit('userDisconnected', user)
@@ -56,12 +56,9 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             if (room2?.users[0].id) {
                 await disconnectUser(room2?.users[0].id)
                 await disconnectUser(room2.users[1].id)
-                debug(room2, "user2")
 
                 const deleteroom = await disconnectGameroom(room2?.id)
-                debug(deleteroom, "deleted room")
             }
-            // await getOngoingGames(false)
         }
 
         const ongoingRooms = await getOngoingGames(true)
@@ -77,6 +74,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
         socket.broadcast.emit('getInfoToLobby', result)
     })
 
+    // Start game
     socket.on('startGame', async (callback) => {
         // Get the current gameroom and send back to client in callback
         const user = await getUser(socket.id)
@@ -155,8 +153,7 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
                     io.in(gameroomId).emit('gameOver', usersArr)
                 }
 
-                // ** If game rounds is less than 10  ** 
-                // Unset reactiontime in DB
+                // If game rounds is less than 10 - Unset reactiontime in DB
                 usersArr.forEach(async (user) => {
                     await updateReactionTime(user.id, 0)
                 })
@@ -218,11 +215,6 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             results: results
         })
     })
-
-    // socket.on('disconnect', async () => {
-    //     //await disconnectUser(socket.id)
-    //     debug('a user disconnected', socket.id)
-    // })
 
     // Recieves objects with results from the client
     socket.on('sendResults', async (player1, player2) => {

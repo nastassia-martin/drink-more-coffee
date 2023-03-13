@@ -5,7 +5,6 @@ export interface ServerToClientEvents {
     playersAnswered: (clicks: boolean) => void
     gameOver: (users: User[]) => void
     userDisconnected: (user: User) => void
-    // roomDisconnected: (gameroomId: GameRoom) => void
     getInfoToLobby: (result: GetGameroomResultLobby) => void
     bothAnswered: (bothAnswred: boolean, user: User[]) => void
     showResults: (result: UserWonResult) => void
@@ -15,8 +14,6 @@ export interface ClientToServerEvents {
     userJoin: (user: User) => void
     startGame: (callback: (result: GetGameroomResult) => void) => void
     cupClicked: (
-        // positionX: number,
-        // positionY: number,
         reactionTime: string,
         rounds: number,
         callback: (result: GetUserResult) => void
