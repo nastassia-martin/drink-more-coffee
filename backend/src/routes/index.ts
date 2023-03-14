@@ -7,7 +7,7 @@ const router = express.Router()
  */
 router.get('/', (req, res) => {
     res.send({
-        message: "I AM CHAT-API, BEEP BOOP"
+        message: "I AM COFFEE GAME, BEEP BOOP"
     })
 })
 
