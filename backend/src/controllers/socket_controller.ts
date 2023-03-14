@@ -49,15 +49,15 @@ export const handleConnection = (socket: Socket<ClientToServerEvents, ServerToCl
             const room = await getRoom(user?.gameroomId)
 
             if (room) {
+                await disconnectUser(user.id)
                 io.in(room?.id).emit('userDisconnected', user)
-            }
 
-            const room2 = await getRoom(user?.gameroomId)
-            if (room2?.users[0].id) {
-                await disconnectUser(room2?.users[0].id)
-                await disconnectUser(room2.users[1].id)
+                const room2 = await getRoom(user?.gameroomId)
+                if (room2?.users.length === 1) {
+                    await disconnectUser(room2?.users[0].id)
+                }
 
-                const deleteroom = await disconnectGameroom(room2?.id)
+                await disconnectGameroom(room.id)
             }
         }
 
