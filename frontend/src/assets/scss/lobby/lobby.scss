@@ -102,7 +102,6 @@ $ff-h2: 'Reenie Beanie';
                 padding: 1rem;
                 line-height: 5mm;
             }
-
         }
 
         .highscore-column {
@@ -153,4 +152,42 @@ $ff-h2: 'Reenie Beanie';
             }
         }
     }
+}
+
+@media screen and (max-width: 600px) {
+
+    h3,
+    .h3 {
+        font-size: 1rem;
+    }
+
+    .lobby-container {
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        .lobby-content {
+            padding: 0rem;
+            padding-top: 1rem;
+
+            .white-column {
+                height: 60vh;
+            }
+        }
+
+        .go-back-btn-div {
+            text-align: center;
+
+            .go-back-btn {
+                margin-left: 0;
+            }
+        }
+    }
+
+    span {
+        font-size: 8px;
+        padding: 5px 0;
+    }
+
 }
