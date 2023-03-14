@@ -1,28 +1,27 @@
-//. 1
-Hitta ett sätt att spara reaktionstiden för varje person och runda i t.ex. en array? 
+# Drink More Coffee
 
-RUNDA 1 EXEMPEL: 
-user1.reactiontime = 60 
-user2.reactiontime = 120
+A group assignment with [Hanna Bjorling](https://github.com/hannabjorling), [Sonja Svidén](https://github.com/sonjasviden), [Nastassia Martin](https://github.com/nastassia-martin)
 
-Spara varje persons reactiontime i en array
+## Assignment, 
+A 2 player game updated in real time. The objective is to click on the coffee cup before your opponent. 
 
-//. 2 
-När alla 10 reactiontimes finns, dela totalen på tio för att få varje persons average
+The winner is the person who gets the most points.
 
-// 3. 
-När vi har ett average, skicka in i result databas som reactionTimeAvg med vilken user den tillhör
+Techniques used: 
+- Node.js
+- Typescript
+- Sockets.io
+- Prisma
+- MongoDB
 
+## Criteria 
+### Pass
+- User can fill in a username
+- Calculation of who gets points, current score, cup position etc must be done on the server side
+- Show timer with both players' reaction time
+- Several games must be able to run simultaneously
 
-
-
-// 1. 
-När users disconnectar, avsluta rum? 
-- Gör socket.on disconnect i socket_controller
-- Radera användaren & room
-- meddela användaren i frontend och skicka tillbaka till start
-
-// 2. 
-När result är skickat till databasen, radera user och gameroom (efter 10st sparade)
-
-// 3. 
+### Merit
+- There should be a lobby where visitors can see how many games are in progress
+- The lobby should show simultaneous & current score
+- Highscore & the results of the last 10 games should be stored in a database and displayed in the lobby
