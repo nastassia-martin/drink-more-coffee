@@ -2,6 +2,9 @@
 
 A group assignment with [Hanna Bjorling](https://github.com/hannabjorling), [Sonja Svidén](https://github.com/sonjasviden), [Nastassia Martin](https://github.com/nastassia-martin)
 
+## Deployed at
+[dricka-mer-kaffe](https://dricka-mer-kaffe.netlify.app)
+
 ## Assignment, 
 A 2 player game updated in real time. The objective is to click on the coffee cup before your opponent. 
 
